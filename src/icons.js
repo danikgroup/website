@@ -1,7 +1,7 @@
 // Icon names usable in content (product features). The CMS select in public/admin/config.yml
 // lists the same keys; add a name in both places.
 import {
-  ArrowDown, Award, Bell, ChevronDown, ChevronLeft, BookOpen, CalendarClock, CalendarDays, Camera, ChartLine, ClipboardCheck,
+  ArrowDown, Award, Check, Bell, ChevronDown, ChevronLeft, BookOpen, CalendarClock, CalendarDays, Camera, ChartLine, ClipboardCheck,
   DatabaseBackup, FileSpreadsheet, FileText, GraduationCap, Languages, Mail, MapPin, Menu,
   MessagesSquare, Phone, Presentation, Puzzle, Receipt, School, Send, Server, Settings, ShieldCheck,
   ShoppingCart, Smartphone, Ticket, UserCheck, Users, Video, Wallet, X,
@@ -46,4 +46,5 @@ export const icons = {
   pin: MapPin,
   menu: Menu,
   close: X,
+  check: Check,
 };

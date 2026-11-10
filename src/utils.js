@@ -24,3 +24,17 @@ export const breadcrumbs = (site, items) => ({
     item: new URL(href(path), site).href,
   })),
 });
+
+// FAQPage JSON-LD for a list of {question, answer}; null when empty so pages can filter it out.
+export const faqLd = (items) =>
+  items.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: items.map((f) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answer },
+        })),
+      }
+    : null;

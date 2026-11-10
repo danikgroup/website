@@ -40,6 +40,8 @@ Format (based on Keep a Changelog: https://keepachangelog.com/en/1.1.0/):
 - Turn the hero rings into a lit stepped dome with rim highlights and a glow; the hero phone now turns in 3D toward the pointer with a glare across its glass (one sweep on load), and the icon tiles are glass with depth of field (far ones smaller, softer, behind the dome).
 - Stand the product phones in 3D on a lit disc with two orbit lines; on scroll each turns from its text toward the reader while the disc drifts slower (scroll-driven CSS, static where unsupported or with reduced motion). Fact panels get light, grain and dividers; the product chooser gets blueprint squares and glass cards.
 - Add a depth field to the hero: floating glass icons and two school chips (grade «۲۰», «حاضر») around the headline, focused on the phone. Items further from it are smaller, fainter, more blurred and float slower; two lens-blurred ones sit in front; pointer parallax pivots on the phone. Phones keep only the faint far layer.
+- Pitch the products on every page: the home page gains a «دفتر، اکسل و گروه پیام‌رسان؛ یا یک پنل؟» before/after table, a panel-per-role section, a «اطلاعات بچه‌ها پیش خودتان می‌ماند» data-safety band and a general FAQ (FAQPage JSON-LD); product pages gain before/after rows, an hour-by-hour «یک روز با …» timeline, the data-safety band, a «مناسب شماست اگر…» list with the other product, and longer FAQs; contact explains the three steps after a call and what to prepare; blog, posts and 404 end with product cards and the demo band.
+- Add `pains`, `day` and `fit` product fields (schema and CMS) for the product page's sales sections.
 
 ### Fixed
 - Fix the home page laying out wider than phone screens while product phones waited to swing in.

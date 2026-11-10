@@ -7,9 +7,12 @@ import Screen from "../components/Screen.astro";
 import Icon from "../components/Icon.astro";
 import DemoBand from "../components/DemoBand.astro";
 import site from "../data/site.json";
-import { href, faDate, products, posts } from "../utils.js";
+import { href, faDate, products, posts, faqLd } from "../utils.js";
 import { screenLabels, phoneLabel } from "../screens.js";
 import ProductScreen from "../components/ProductScreen.astro";
+import Compare from "../components/Compare.astro";
+import Trust from "../components/Trust.astro";
+import Faq from "../components/Faq.astro";
 
 const productList = await products();
 const latest = (await posts()).slice(0, 3);
@@ -36,6 +39,33 @@ const steps = [
   { icon: "backup", title: "پشتیبان‌گیری شبانه", text: "هر شب نسخهٔ پشتیبان گرفته می‌شود تا اطلاعات از دست نرود." },
 ];
 
+// Today's scattered tools against one panel; true for both products.
+const pains = [
+  { topic: "حضور و غیاب", before: "دفتر کاغذی و تماس تلفنی با خانهٔ هر غایب.", after: "معلم با گوشی حضور و غیاب می‌کند و خانوادهٔ غایب همان لحظه پیامک و اعلان می‌گیرد." },
+  { topic: "شهریه", before: "فهرست بدهکارها در اکسل و تماس برای یادآوری هر قسط.", after: "اقساط در پنل ثبت است، یادآوری سررسید خودکار می‌رود و اولیا آنلاین پرداخت می‌کنند." },
+  { topic: "خبر و عکس کلاس", before: "گروه پیام‌رسانی که شمارهٔ همهٔ اولیا در آن پیداست.", after: "هر خانواده فقط خبر و عکس کلاس فرزند خودش را در پنل می‌بیند." },
+  { topic: "نمره و کارنامه", before: "جمع زدن نمره‌ها در اکسل و تایپ کارنامه، شب آخر.", after: "نمره در پنل ثبت می‌شود، نتیجه حساب می‌شود و کارنامه آمادهٔ چاپ است." },
+  { topic: "ثبت‌نام", before: "متقاضی‌هایی که شماره‌شان در دفترچه گم می‌شود.", after: "هر متقاضی از اولین تماس تا ثبت‌نام پیگیری می‌شود و یادآوری روزانه دارد." },
+  { topic: "حقوق کادر", before: "شمردن جلسه‌ها و ساعت‌های هر معلم، آخر هر ماه.", after: "جلسه‌های برگزارشده و ساعت حضور، خودکار به حساب هر نفر می‌رود." },
+];
+
+// What each role gets; only features both products ship.
+const roles = [
+  { icon: "chart", title: "مدیر", items: ["دانش‌آموزانی که غیبت پشت سر هم یا افت نمره دارند، خودشان در فهرست پیگیری می‌آیند.", "گزارش هر ماه: نرخ حضور، شهریهٔ وصول‌شده در برابر طلب.", "هر تغییر در اطلاعات با نام و زمان ثبت می‌شود."] },
+  { icon: "import", title: "دفتر و حسابداری", items: ["ثبت‌نام گروهی از فایل CSV اکسل و چاپ برگهٔ ورود هر نفر.", "صورتحساب، قسط و ثبت پرداخت در یک صفحه.", "گزارش مالی ماه به تاریخ شمسی."] },
+  { icon: "class", title: "معلم و مدرس", items: ["حضور و غیاب با چند لمس روی گوشی.", "نمره و آزمون آنلاین کلاس‌های خودش.", "برنامهٔ هفته و جلسه‌های امروز در یک نگاه."] },
+  { icon: "users", title: "خانواده", items: ["غیبت، نمره و کارنامهٔ فرزند، همان روز.", "قسط بعدی و پرداخت آنلاین از گوشی.", "خبر و عکس کلاس، بدون گروه پیام‌رسان."] },
+];
+
+const faq = [
+  { question: "دانیک مدرسه را انتخاب کنیم یا دانما؟", answer: "اگر مدرسه با پایه و سال تحصیلی (اول تا دوازدهم) هستید، دانیک مدرسه. اگر آموزشگاه یا مؤسسه‌ای با دوره و کلاس گروهی و خصوصی هستید، دانما." },
+  { question: "اطلاعات فعلی‌مان در اکسل است؛ باید از اول وارد کنیم؟", answer: "نه. فهرست دانش‌آموزان و اولیا از فایل CSV (ذخیرهٔ اکسل) وارد می‌شود. پیش از ثبت، یک اجرای آزمایشی خطای هر ردیف را نشان می‌دهد و تا تأیید نکنید چیزی ذخیره نمی‌شود." },
+  { question: "اولیا باید اپلیکیشن نصب کنند؟", answer: "نه. پنل در مرورگر گوشی باز می‌شود و می‌شود آن را مثل اپلیکیشن روی صفحهٔ گوشی گذاشت." },
+  { question: "پیامک‌ها از کجا فرستاده می‌شوند؟", answer: "از سامانهٔ پیامکی که مجموعهٔ شما دارد؛ نرم‌افزار به آن وصل می‌شود. بدون پیامک هم اعلان داخل پنل و اعلان مرورگر کار می‌کند." },
+  { question: "لازم است همهٔ بخش‌ها را بخریم؟", answer: "نه. بخش‌هایی مثل آزمون آنلاین، پیگیری متقاضیان، اموال و حقوق کادر جدا فعال می‌شوند؛ با همان‌هایی که لازم دارید شروع کنید." },
+  { question: "تاریخ‌ها شمسی است؟", answer: "بله. تقویم، برنامهٔ هفتگی، صورتحساب و کارنامه همه شمسی‌اند و تعطیلات رسمی در برنامهٔ کلاس‌ها حساب می‌شود." },
+];
+
 const jsonLd = [
   {
     "@context": "https://schema.org",
@@ -44,6 +74,7 @@ const jsonLd = [
     url: new URL(href("/"), Astro.site).href,
     inLanguage: "fa",
   },
+  faqLd(faq),
 ];
 ---
 <Base title={site.name} description={site.description} jsonLd={jsonLd}>
@@ -54,8 +85,21 @@ const jsonLd = [
     screen="rollcall"
     screenLabel={screenLabels.rollcall}
     icons={["money", "report", "exam", "message", "attendance", "timetable", "bell", "graduation"]}
-    next="#why"
+    next="#pain"
   />
+
+  <section id="pain" class="section pains" aria-labelledby="pain-title">
+    <div class="wrap">
+      <div class="intro">
+        <h2 id="pain-title">دفتر، اکسل و گروه پیام‌رسان؛ یا یک پنل؟</h2>
+        <p>
+          بیشتر مدرسه‌ها و آموزشگاه‌ها کارشان را بین دفتر کاغذی، چند فایل اکسل و گروه‌های پیام‌رسان پخش کرده‌اند.
+          هزینه‌اش تماس‌های تکراری، شهریهٔ عقب‌افتاده و شب‌های کارنامه است.
+        </p>
+      </div>
+      <Compare rows={pains} before="امروز" after="با نرم‌افزارهای دانیک" caption="کارهای روزانهٔ مدرسه و آموزشگاه، امروز و با نرم‌افزارهای دانیک" />
+    </div>
+  </section>
 
   <section id="why" class="section">
     <div class="wrap">
@@ -102,6 +146,28 @@ const jsonLd = [
       </section>
     );
   })}
+
+  <section class="section" aria-labelledby="roles-title">
+    <div class="wrap">
+      <div class="intro">
+        <h2 id="roles-title">هر کس، پنل خودش</h2>
+        <p>مدیر، دفتر، معلم و خانواده هر کدام با گوشی یا رایانه وارد می‌شوند و فقط کارهای خودشان را می‌بینند.</p>
+      </div>
+      <ul class="roles" data-live data-draw>
+        {roles.map((r, i) => (
+          <li style={`--i: ${i}`}>
+            <span class="ring"><Icon name={r.icon} size={26} /></span>
+            <h3>{r.title}</h3>
+            <ul>
+              {r.items.map((item) => <li>{item}</li>)}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <Trust />
 
   <section class="section process" aria-labelledby="process-title">
     <div class="wrap">
@@ -185,10 +251,75 @@ const jsonLd = [
     </section>
   )}
 
+  <Faq items={faq} />
+
   <DemoBand />
 </Base>
 
 <style>
+  .pains {
+    background: var(--grey);
+  }
+
+  /* Roles: four columns, each a ring, a title and what that person gets. */
+  .roles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 40px clamp(24px, 3vw, 40px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .roles > li {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    padding-block-start: 24px;
+    border-block-start: 2px solid var(--line);
+  }
+
+  .roles ul {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .roles ul li {
+    position: relative;
+    padding-inline-start: 18px;
+  }
+
+  .roles ul li::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.75em;
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--green-2);
+  }
+
+  :global(.js) .roles :global(svg > *) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    animation: roles-draw 1s ease-out both paused;
+    animation-delay: calc(0.1s + var(--i) * 0.16s);
+  }
+
+  .roles:global(.is-live) :global(svg > *) {
+    animation-play-state: running;
+  }
+
+  @keyframes roles-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
   .kicker {
     display: block;
     color: var(--muted);

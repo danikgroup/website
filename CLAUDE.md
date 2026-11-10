@@ -88,6 +88,12 @@ is darker than the template's.
   `src/assets/products/`, with `screenshotAlt`) when it has one, else its drawn `screen`.
   `ProductScreen` (`data`, `eager`) picks which inside a `Device`, and `phoneLabel(data)` gives the
   Device's label. `Hero` takes the phone's content as its slot, with the drawn screen as the fallback.
+- Sales sections: `Compare` (`rows=[{topic,before,after}]`, `before`/`after` column labels; cards under
+  760px), `Timeline` (`items=[{time,who,text}]`, lights up in order), `Trust` (navy data-safety band,
+  copy inside; only claims both products ship), `Faq` (`items`, `title`; pair with `faqLd(items)` from
+  `utils.js` in the page's `jsonLd`), `ProductCards` (`except` = product id; for pages that would
+  otherwise dead-end). Product pages read `pains`, `day`, `fit` from the product's front matter; an
+  empty list hides its section. Every sales claim must trace to the product repo's changelog.
 - Icon names: `src/icons.js` maps names to Lucide icons. Content may only use the names listed in
   `ICON_NAMES` (`src/content.config.js`) and the CMS select. Keep all three in step.
 - A route's slug is the Markdown file name (`entry.id`). The CMS asks for it (`{{fields._slug}}`).

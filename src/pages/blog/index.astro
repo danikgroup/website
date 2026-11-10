@@ -2,6 +2,8 @@
 import { Image } from "astro:assets";
 import Base from "../../layouts/Base.astro";
 import PageHeader from "../../components/PageHeader.astro";
+import ProductCards from "../../components/ProductCards.astro";
+import DemoBand from "../../components/DemoBand.astro";
 import site from "../../data/site.json";
 import { href, faDate, posts, breadcrumbs } from "../../utils.js";
 
@@ -14,7 +16,7 @@ const jsonLd = [breadcrumbs(Astro.site, [[site.name, "/"], ["وبلاگ", "/blog
   <section class="section">
     <div class="wrap">
       {list.length === 0 ? (
-        <p class="empty">هنوز نوشته‌ای منتشر نشده است.</p>
+        <p class="empty">اولین نوشته‌ها به‌زودی منتشر می‌شوند. تا آن موقع، نرم‌افزارها را ببینید.</p>
       ) : (
         <ul class="posts">
           {list.map((post) => (
@@ -31,11 +33,27 @@ const jsonLd = [breadcrumbs(Astro.site, [[site.name, "/"], ["وبلاگ", "/blog
       )}
     </div>
   </section>
+
+  <section class="section products" aria-labelledby="products-title">
+    <div class="wrap">
+      <div class="intro">
+        <h2 id="products-title">نرم‌افزار مدرسه یا آموزشگاه می‌خواهید؟</h2>
+        <p>دو نرم‌افزار فارسی که روی سرور خود مجموعه نصب می‌شوند؛ هر کدام برای کار خودش.</p>
+      </div>
+      <ProductCards />
+    </div>
+  </section>
+
+  <DemoBand />
 </Base>
 
 <style>
   .empty {
     text-align: center;
+  }
+
+  .products {
+    background: var(--grey);
   }
 
   .posts {

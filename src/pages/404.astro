@@ -1,15 +1,28 @@
 ---
 import Base from "../layouts/Base.astro";
 import PageHeader from "../components/PageHeader.astro";
+import ProductCards from "../components/ProductCards.astro";
 import { href } from "../utils.js";
 ---
 <Base title="صفحه پیدا نشد" description="این نشانی در سایت وجود ندارد." noindex>
   <PageHeader title="صفحه پیدا نشد" lead="این نشانی در سایت وجود ندارد یا جابه‌جا شده است.">
     <a class="btn btn-blue home" href={href("/")}>رفتن به صفحهٔ اصلی</a>
   </PageHeader>
+  <section class="section">
+    <div class="wrap">
+      <h2 class="title">شاید دنبال یکی از این‌ها بودید</h2>
+      <ProductCards />
+    </div>
+  </section>
 </Base>
 
 <style>
+  .title {
+    margin-block-end: 32px;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
   .home {
     margin-block-start: 32px;
   }

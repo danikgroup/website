@@ -1,0 +1,119 @@
+---
+// Navy band answering the principal's first worry: where the children's data lives and who sees it.
+// Every point is shipped in both products (own server, nightly backup, scoped access, audit log,
+// photos stripped of location, verifiable certificates).
+import Icon from "./Icon.astro";
+
+const points = [
+  { icon: "server", title: "روی سرور خودتان", text: "نرم‌افزار روی سرور مدرسه یا آموزشگاه نصب می‌شود. اطلاعات هر مجموعه جداست و با هیچ مجموعهٔ دیگری مشترک نیست." },
+  { icon: "backup", title: "پشتیبان هر شب", text: "هر شب خودکار از همهٔ اطلاعات نسخهٔ پشتیبان گرفته می‌شود." },
+  { icon: "shield", title: "هر کس، سهم خودش", text: "خانواده فقط فرزند خودش را می‌بیند و معلم فقط کلاس‌های خودش را. چیزی که به کسی مربوط نیست، برایش وجود ندارد." },
+  { icon: "camera", title: "عکس بدون موقعیت مکانی", text: "اطلاعات مکان و دستگاه از عکس‌های کلاس پاک می‌شود و فایل‌ها با نام تصادفی ذخیره می‌شوند." },
+  { icon: "report", title: "ردپای هر تغییر", text: "اینکه چه کسی، کی و چه چیزی را عوض کرده، در گزارشی جدا از اطلاعات اصلی ثبت می‌شود." },
+  { icon: "award", title: "گواهی قابل استعلام", text: "گواهی‌ها لینک استعلام دارند؛ هر کسی می‌تواند درستی‌شان را ببیند و جعلشان بی‌فایده است." },
+];
+---
+<section class="trust" aria-labelledby="trust-title">
+  <div class="wrap">
+    <div class="intro">
+      <h2 id="trust-title">اطلاعات بچه‌ها پیش خودتان می‌ماند</h2>
+      <p>
+        نام، شمارهٔ تماس، نمره و بدهی خانواده‌ها حساس‌ترین اطلاعات مجموعهٔ شماست. نرم‌افزار از روز اول با همین
+        حساسیت ساخته شده است.
+      </p>
+    </div>
+    <ul data-live data-draw>
+      {points.map((p, i) => (
+        <li style={`--i: ${i}`}>
+          <span class="ring"><Icon name={p.icon} size={26} /></span>
+          <span><b>{p.title}</b>{p.text}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .trust {
+    position: relative;
+    isolation: isolate;
+    padding-block: var(--section);
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05), transparent 40%),
+      var(--grain),
+      radial-gradient(ellipse 90% 70% at 50% 0, #322d63, var(--navy) 70%);
+    color: #c2c0d6;
+  }
+
+  /* Blueprint squares fading out from the top, as on the product chooser. */
+  .trust::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px) 0 0 / 24px 24px;
+    mask-image: radial-gradient(ellipse 60% 50% at 50% 0, #000, transparent);
+    z-index: -1;
+  }
+
+  h2,
+  b {
+    color: var(--white);
+  }
+
+  ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px clamp(24px, 4vw, 56px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+
+  li > span:last-child {
+    display: grid;
+    gap: 4px;
+  }
+
+  b {
+    font-size: 1.05rem;
+  }
+
+  .ring {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 56px;
+    block-size: 56px;
+    border: 1.5px solid rgba(20, 226, 164, 0.6);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    color: var(--green);
+  }
+
+  /* Icons draw in one after another when the list scrolls in. */
+  :global(.js) .trust :global(svg > *) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    animation: trust-draw 1s ease-out both paused;
+    animation-delay: calc(0.1s + var(--i) * 0.14s);
+  }
+
+  .trust ul:global(.is-live) :global(svg > *) {
+    animation-play-state: running;
+  }
+
+  @keyframes trust-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+</style>

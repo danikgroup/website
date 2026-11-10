@@ -1,0 +1,89 @@
+---
+// The two products as linked cards (icon, name, tagline), for pages that would otherwise end
+// without a next step: blog, posts, 404. `except` drops one product by id.
+import Icon from "./Icon.astro";
+import { href, products } from "../utils.js";
+
+const { except } = Astro.props;
+const list = (await products()).filter((p) => p.id !== except);
+---
+<ul class="cards">
+  {list.map((p) => (
+    <li>
+      <a href={href(`/products/${p.id}/`)}>
+        <span class="ring"><Icon name={p.data.features[0]?.icon ?? "module"} size={28} /></span>
+        <span class="text">
+          <small>{p.data.category}</small>
+          <b>{p.data.name}</b>
+          <span>{p.data.tagline}</span>
+        </span>
+        <span class="go" aria-hidden="true"><Icon name="chevronLeft" size={20} strokeWidth={2.4} /></span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 20px;
+    align-items: center;
+    block-size: 100%;
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: var(--white);
+    box-shadow: var(--rim), var(--shadow);
+    color: var(--muted);
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  a:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--rim), var(--shadow-strong);
+  }
+
+  .ring {
+    display: grid;
+    place-items: center;
+    inline-size: 60px;
+    block-size: 60px;
+    border: 1.5px solid var(--blue-2);
+    border-radius: 50%;
+    color: var(--blue);
+  }
+
+  .text {
+    display: grid;
+  }
+
+  small {
+    font-size: 0.85rem;
+  }
+
+  b {
+    color: var(--navy);
+    font-size: 1.3rem;
+  }
+
+  .go {
+    display: grid;
+    place-items: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: 50%;
+    background: var(--blue-grad);
+    color: var(--white);
+  }
+</style>

@@ -5,8 +5,14 @@ import Base from "../../layouts/Base.astro";
 import Hero from "../../components/Hero.astro";
 import Features from "../../components/Features.astro";
 import DemoBand from "../../components/DemoBand.astro";
+import Compare from "../../components/Compare.astro";
+import Timeline from "../../components/Timeline.astro";
+import Trust from "../../components/Trust.astro";
+import Faq from "../../components/Faq.astro";
+import ProductCards from "../../components/ProductCards.astro";
+import Icon from "../../components/Icon.astro";
 import site from "../../data/site.json";
-import { products, breadcrumbs } from "../../utils.js";
+import { products, breadcrumbs, faqLd } from "../../utils.js";
 import { phoneLabel } from "../../screens.js";
 import ProductScreen from "../../components/ProductScreen.astro";
 
@@ -35,18 +41,8 @@ const jsonLd = [
     publisher: { "@type": "Organization", name: site.name },
   },
   breadcrumbs(Astro.site, [[site.name, "/"], [data.name, `/products/${product.id}/`]]),
-  ...(data.faq.length
-    ? [{
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: data.faq.map((f) => ({
-          "@type": "Question",
-          name: f.question,
-          acceptedAnswer: { "@type": "Answer", text: f.answer },
-        })),
-      }]
-    : []),
-];
+  faqLd(data.faq),
+].filter(Boolean);
 ---
 <Base title={data.title} description={data.description} image={data.image} imageAlt={data.imageAlt} jsonLd={jsonLd}>
   <Hero
@@ -70,30 +66,64 @@ const jsonLd = [
     )}
   </section>
 
+  {data.pains.length > 0 && (
+    <section class="section pains" aria-labelledby="pains">
+      <div class="wrap">
+        <div class="intro">
+          <h2 id="pains">کارهایی که {data.name} از دوشتان برمی‌دارد</h2>
+          <p>همان کارهای هر روز، بدون دفتر و اکسل و تماس‌های تکراری.</p>
+        </div>
+        <Compare rows={data.pains} before="امروز" after={`با ${data.name}`} caption={`کارهای روزانه، امروز و با ${data.name}`} />
+      </div>
+    </section>
+  )}
+
   {data.features.length > 0 && (
-    <section class="section features" aria-labelledby="features">
+    <section class="section" aria-labelledby="features">
       <div class="wrap">
         <div class="intro">
           <h2 id="features">امکانات {data.name}</h2>
+          <p>هر بخش برای یک کار واقعی مجموعه ساخته شده و با بقیه یکپارچه است؛ اطلاعات یک بار وارد می‌شود.</p>
         </div>
         <Features items={data.features} />
       </div>
     </section>
   )}
 
-  {data.faq.length > 0 && (
-    <section class="section" aria-labelledby="faq">
-      <div class="wrap faq">
-        <div class="intro"><h2 id="faq">پرسش‌های پرتکرار</h2></div>
-        {data.faq.map((f) => (
-          <details>
-            <summary>{f.question}</summary>
-            <p>{f.answer}</p>
-          </details>
-        ))}
+  {data.day.length > 0 && (
+    <section class="section day" aria-labelledby="day">
+      <div class="wrap">
+        <div class="intro">
+          <h2 id="day">یک روز با {data.name}</h2>
+          <p>از صبح تا نیمه‌شب؛ کارهایی که خودشان انجام می‌شوند یا با یک لمس روی گوشی.</p>
+        </div>
+        <Timeline items={data.day} />
       </div>
     </section>
   )}
+
+  <Trust />
+
+  {data.fit.length > 0 && (
+    <section class="section" aria-labelledby="fit">
+      <div class="wrap fit-grid">
+        <div>
+          <h2 id="fit">{data.name} مناسب شماست اگر…</h2>
+          <ul class="fit">
+            {data.fit.map((item) => (
+              <li><span class="tick"><Icon name="check" size={16} strokeWidth={2.6} /></span>{item}</li>
+            ))}
+          </ul>
+        </div>
+        <aside aria-labelledby="other">
+          <h3 id="other">دنبال چیز دیگری هستید؟</h3>
+          <ProductCards except={product.id} />
+        </aside>
+      </div>
+    </section>
+  )}
+
+  <Faq items={data.faq} />
 
   <DemoBand />
 </Base>
@@ -115,52 +145,56 @@ const jsonLd = [
     box-shadow: var(--shadow);
   }
 
-  .faq {
-    max-inline-size: 760px;
+  .pains {
+    background: var(--grey);
   }
 
-  details {
-    border-block-end: 1px solid var(--line);
+  .day {
+    padding-block-end: calc(var(--section) - 36px);
   }
 
-  summary {
-    display: flex;
-    justify-content: space-between;
+  .fit-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: clamp(40px, 6vw, 96px);
     align-items: center;
+  }
+
+  .fit {
+    display: grid;
     gap: 16px;
-    padding-block: 20px;
-    color: var(--navy);
-    font-weight: 700;
-    font-size: 1.1rem;
-    cursor: pointer;
+    margin: 28px 0 0;
+    padding: 0;
     list-style: none;
+    color: var(--navy);
+    font-size: 1.1rem;
   }
 
-  summary::-webkit-details-marker {
-    display: none;
+  .fit li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
   }
 
-  /* Plus that turns into a minus when open. */
-  summary::after {
-    content: "+";
+  .tick {
     display: grid;
     place-items: center;
     flex: none;
-    inline-size: 36px;
-    block-size: 36px;
+    inline-size: 28px;
+    block-size: 28px;
+    margin-block-start: 3px;
     border-radius: 50%;
-    background: var(--blue-grad);
-    color: var(--white);
-    font-size: 1.3rem;
-    transition: rotate 0.25s;
+    background: var(--green-grad);
+    box-shadow: var(--rim);
   }
 
-  details[open] summary::after {
-    content: "−";
-    rotate: 180deg;
+  aside h3 {
+    margin-block-end: 20px;
   }
 
-  details p {
-    padding-block-end: 20px;
+  @media (max-width: 900px) {
+    .fit-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

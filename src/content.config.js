@@ -36,6 +36,10 @@ const products = defineCollection({
         .array(z.object({ icon: z.enum(ICON_NAMES).default("module"), title: z.string(), text: z.string() }))
         .default([]),
       faq: z.array(z.object({ question: z.string(), answer: z.string() })).default([]),
+      // Sales sections of the product page; each is skipped when empty.
+      pains: z.array(z.object({ topic: z.string(), before: z.string(), after: z.string() })).default([]),
+      day: z.array(z.object({ time: z.string(), who: z.string(), text: z.string() })).default([]),
+      fit: z.array(z.string()).default([]),
     }),
 });
 

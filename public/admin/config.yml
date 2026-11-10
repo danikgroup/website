@@ -111,6 +111,28 @@ collections:
         fields:
           - { name: question, label: پرسش, widget: string }
           - { name: answer, label: پاسخ, widget: text }
+      # Sales sections of the product page (src/content.config.js); an empty list hides its section.
+      - name: pains
+        label: "قبل و بعد (کار امروز مجموعه ← همان کار با این محصول)"
+        widget: list
+        required: false
+        fields:
+          - { name: topic, label: موضوع, widget: string }
+          - { name: before, label: امروز، بدون نرم‌افزار, widget: text }
+          - { name: after, label: با این محصول, widget: text }
+      - name: day
+        label: یک روز با این محصول (به ترتیب ساعت)
+        widget: list
+        required: false
+        fields:
+          - { name: time, label: "ساعت (مثل ۷:۴۵)", widget: string }
+          - { name: who, label: "چه کسی (مثل معلم، ولی، دفتر)", widget: string }
+          - { name: text, label: چه اتفاقی می‌افتد, widget: text }
+      - name: fit
+        label: مناسب شماست اگر…
+        widget: list
+        required: false
+        field: { name: item, label: مورد, widget: string }
       - { name: body, label: معرفی, widget: markdown }
 
   - name: settings

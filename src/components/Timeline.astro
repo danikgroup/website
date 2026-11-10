@@ -1,0 +1,125 @@
+---
+// "A day with the product": hours down a rail, each moment lit in turn when the list scrolls in.
+// items=[{time, who, text}] in time order.
+const { items = [] } = Astro.props;
+---
+<ol class="timeline" data-live>
+  {items.map((t, i) => (
+    <li style={`--i: ${i}`}>
+      <time>{t.time}</time>
+      <span class="dot" aria-hidden="true"></span>
+      <p><b>{t.who}</b>{t.text}</p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .timeline {
+    display: grid;
+    max-inline-size: 760px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4.5rem 28px 1fr;
+    gap: 0 20px;
+    align-items: start;
+    padding-block-end: 36px;
+  }
+
+  /* The rail: a line through the dots, stopping at the last one. */
+  li:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    inset-block: 28px 0;
+    inset-inline-start: calc(4.5rem + 20px + 13px);
+    inline-size: 2px;
+    background: var(--line);
+  }
+
+  time {
+    color: var(--navy);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: end;
+  }
+
+  .dot {
+    position: relative;
+    inline-size: 28px;
+    block-size: 28px;
+    border: 2px solid var(--blue-2);
+    border-radius: 50%;
+    background: var(--white);
+  }
+
+  .dot::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: var(--blue-grad);
+  }
+
+  p {
+    display: grid;
+    gap: 2px;
+    max-inline-size: 52ch;
+  }
+
+  b {
+    color: var(--navy);
+    font-size: 1.05rem;
+  }
+
+  /* Moments light up one after another, like a clock running through the day. */
+  :global(.js) .timeline .dot {
+    animation: day-light 0.8s ease-out both paused;
+    animation-delay: calc(0.15s + var(--i) * 0.28s);
+  }
+
+  .timeline:global(.is-live) .dot {
+    animation-play-state: running;
+  }
+
+  @keyframes day-light {
+    from {
+      scale: 0.4;
+      border-color: var(--line);
+    }
+
+    60% {
+      scale: 1.2;
+      box-shadow: 0 0 0 8px rgba(20, 105, 235, 0.12);
+    }
+  }
+
+  @media (max-width: 520px) {
+    li {
+      grid-template-columns: 3.4rem 22px 1fr;
+      gap: 0 14px;
+    }
+
+    li:not(:last-child)::before {
+      inset-inline-start: calc(3.4rem + 14px + 10px);
+    }
+
+    .dot {
+      inline-size: 22px;
+      block-size: 22px;
+    }
+
+    .dot::after {
+      inset: 4px;
+    }
+
+    time {
+      font-size: 1.1rem;
+    }
+  }
+</style>
