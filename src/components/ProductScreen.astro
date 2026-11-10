@@ -1,0 +1,32 @@
+---
+// What a product's phone shows: its real screenshot when the CMS has one, else its drawn screen.
+// Goes inside <Device>; pair it with phoneLabel(data) from src/screens.js for the Device label.
+import { Image } from "astro:assets";
+import Screen from "./Screen.astro";
+
+const { data, eager = false } = Astro.props;
+---
+{data.screenshot ? (
+  <Image
+    class="shot"
+    src={data.screenshot}
+    alt=""
+    widths={[280, 560]}
+    sizes="280px"
+    loading={eager ? "eager" : "lazy"}
+    fetchpriority={eager ? "high" : undefined}
+  />
+) : (
+  <Screen kind={data.screen} />
+)}
+
+<style>
+  /* Fill the screen under the drawn status bar (the screenshots have none of their own). */
+  .shot {
+    display: block;
+    inline-size: 100%;
+    block-size: calc(100% - 30px);
+    object-fit: cover;
+    object-position: top;
+  }
+</style>

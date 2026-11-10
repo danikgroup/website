@@ -1,0 +1,71 @@
+---
+import { render } from "astro:content";
+import { Image, getImage } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import DemoBand from "../../components/DemoBand.astro";
+import site from "../../data/site.json";
+import { faDate, posts, breadcrumbs } from "../../utils.js";
+
+export async function getStaticPaths() {
+  return (await posts()).map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { data } = post;
+const { Content } = await render(post);
+const url = new URL(Astro.url.pathname, Astro.site).href;
+const cover = data.image && (await getImage({ src: data.image, width: 1200, format: "jpg" }));
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: data.title,
+    description: data.description,
+    datePublished: data.date.toISOString(),
+    dateModified: (data.updated ?? data.date).toISOString(),
+    inLanguage: "fa",
+    mainEntityOfPage: url,
+    ...(cover && { image: new URL(cover.src, Astro.site).href }),
+    author: { "@type": "Organization", name: site.name },
+    publisher: { "@type": "Organization", name: site.name },
+  },
+  breadcrumbs(Astro.site, [[site.name, "/"], ["وبلاگ", "/blog/"], [data.title, `/blog/${post.id}/`]]),
+];
+---
+<Base title={data.title} description={data.description} image={data.image} imageAlt={data.imageAlt} type="article" jsonLd={jsonLd}>
+  <article>
+    <PageHeader title={data.title}>
+      <time datetime={data.date.toISOString()}>{faDate(data.date)}</time>
+    </PageHeader>
+    <div class="section body">
+      {data.image && (
+        <Image class="cover" src={data.image} alt={data.imageAlt ?? ""} widths={[640, 1100]} sizes="(max-width: 1100px) 100vw, 1100px" loading="eager" fetchpriority="high" />
+      )}
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+  <DemoBand />
+</Base>
+
+<style>
+  time {
+    display: block;
+    margin-block-start: 16px;
+  }
+
+  .body {
+    padding-block-start: 0;
+    padding-inline: var(--gutter);
+  }
+
+  .cover {
+    inline-size: min(100%, 1100px);
+    margin: 0 auto 56px;
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+  }
+</style>

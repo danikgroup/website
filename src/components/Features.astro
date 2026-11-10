@@ -1,0 +1,68 @@
+---
+// Template feature row: line icon, title, short text, centred.
+import Icon from "./Icon.astro";
+
+const { items } = Astro.props;
+---
+<ul class="features" data-live data-draw>
+  {items.map((f, i) => (
+    <li style={`--i: ${i}`}>
+      <Icon name={f.icon} size={64} strokeWidth={1.2} class={i % 2 ? "green" : "blue"} />
+      <h3>{f.title}</h3>
+      <p>{f.text}</p>
+    </li>
+  ))}
+</ul>
+
+<style>
+  /* Icons draw their strokes, one feature after another, when the row scrolls in. */
+  :global(.js) .features :global(svg > *) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    animation: features-draw 1.1s ease-out both paused;
+    animation-delay: calc(0.1s + var(--i) * 0.18s);
+  }
+
+  .features:global(.is-live) :global(svg > *) {
+    animation-play-state: running;
+  }
+
+  @keyframes features-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: clamp(40px, 5vw, 64px) clamp(24px, 4vw, 48px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  li {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 12px;
+  }
+
+  h3 {
+    margin-block-start: 12px;
+  }
+
+  p {
+    max-inline-size: 30ch;
+  }
+
+  .blue {
+    color: var(--blue);
+  }
+
+  .green {
+    color: var(--green-2);
+  }
+</style>

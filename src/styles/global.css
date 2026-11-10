@@ -1,0 +1,198 @@
+/* Tokens follow the Phlox "app landing two" template the owner chose.
+   Text on green is navy: white on #14E2A4 is ~2:1 and fails contrast. */
+:root {
+  --navy: #23203f;
+  --muted: #716f87;
+  --blue: #1469eb;
+  --blue-2: #4d8af0;
+  --green: #14e2a4;
+  --green-2: #14c691;
+  --grey: #f1f1f1;
+  --line: #e4e6ef;
+  --white: #ffffff;
+
+  --blue-grad: linear-gradient(135deg, #1257c9 0%, #1469eb 100%);
+  --green-grad: linear-gradient(135deg, #14e2a4 0%, #14c691 100%);
+  --shadow: 0 20px 50px rgba(7, 65, 154, 0.16);
+  --shadow-strong: 0 15px 35px rgba(7, 65, 154, 0.25);
+
+  --wrap: 1200px;
+  --gutter: clamp(16px, 4vw, 32px);
+  --section: clamp(72px, 10vw, 128px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--muted);
+  font-family: "Vazirmatn Variable", Tahoma, sans-serif;
+  font-size: 1rem;
+  line-height: 1.85;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--navy);
+  line-height: 1.4;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--blue);
+}
+
+img,
+svg {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.wrap {
+  inline-size: min(100% - 2 * var(--gutter), var(--wrap));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+/* Centred heading + one paragraph, the template's section opener. */
+.intro {
+  max-inline-size: 38rem;
+  margin-inline: auto;
+  margin-block-end: clamp(40px, 6vw, 72px);
+  text-align: center;
+}
+
+.intro p {
+  margin-block-start: 16px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 48px;
+  padding: 10px 28px;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-green {
+  background: var(--green-grad);
+  color: var(--navy);
+  box-shadow: 0 10px 25px rgba(7, 119, 86, 0.25);
+}
+
+.btn-blue {
+  background: var(--blue-grad);
+  color: var(--white);
+  box-shadow: var(--shadow-strong);
+}
+
+.btn-outline {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: var(--white);
+}
+
+.btn-navy {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Long-form Markdown (posts, product intro). */
+.prose {
+  max-inline-size: 68ch;
+  margin-inline: auto;
+  font-size: 1.0625rem;
+}
+
+.prose > * + * {
+  margin-block-start: 1.2em;
+}
+
+.prose h2 {
+  font-size: 1.6rem;
+  margin-block-start: 2em;
+}
+
+.prose h3 {
+  margin-block-start: 1.6em;
+}
+
+.prose img {
+  border-radius: 18px;
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.4em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

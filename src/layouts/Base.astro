@@ -1,0 +1,163 @@
+---
+// Owns every page's <head>: title, meta, canonical, Open Graph, JSON-LD. Pages only pass data.
+import "@fontsource-variable/vazirmatn";
+import "../styles/global.css";
+import { getImage } from "astro:assets";
+import Header from "../components/Header.astro";
+import logo from "../assets/logo.png";
+import site from "../data/site.json";
+import { href, products as getProducts } from "../utils.js";
+
+const { title, description, image, imageAlt = "", type = "website", jsonLd = [], noindex = false } = Astro.props;
+
+const products = await getProducts();
+const fullTitle = title === site.name ? title : `${title} | ${site.name}`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const absolute = (img) => new URL(img.src, Astro.site).href;
+
+// Every icon comes from src/assets/logo.png. iOS turns transparency black, so its icon gets white.
+const tabIcon = await getImage({ src: logo, width: 64, height: 64, format: "png" });
+const touchIcon = await getImage({ src: logo, width: 180, height: 180, format: "png", background: "#ffffff" });
+const logoImage = await getImage({ src: logo, width: 500, height: 500, format: "png" });
+
+// A page's own image makes a large share card; otherwise the logo makes a small one.
+const ogImage = image && (await getImage({ src: image, width: 1200, height: 630, fit: "cover", format: "jpg" }));
+const ogImageUrl = ogImage ? absolute(ogImage) : absolute(logoImage);
+const ogImageAlt = ogImage ? imageAlt : `نشان ${site.name}`;
+const year = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date());
+
+const organization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  alternateName: site.alternateName,
+  url: new URL(href("/"), Astro.site).href,
+  logo: absolute(logoImage),
+  ...(site.email && { email: site.email }),
+  ...(site.phone && { telephone: site.phone }),
+  ...(site.social.length && { sameAs: site.social.map((s) => s.url) }),
+};
+---
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#f1f1f1" />
+    <link rel="icon" href={tabIcon.src} type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href={touchIcon.src} />
+    <link rel="sitemap" href={href("/sitemap-index.xml")} />
+    <link rel="alternate" type="application/rss+xml" title={site.name} href={href("/rss.xml")} />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:locale" content="fa_IR" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+
+    <script type="application/ld+json" set:html={JSON.stringify([organization, ...jsonLd])} />
+    <!-- Before first paint: animation start states apply only when the motion script will run. -->
+    <script is:inline>document.documentElement.classList.add("js");</script>
+    <script>import "../scripts/live.js";</script>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p class="title">نرم‌افزار مدرسه یا آموزشگاه‌تان را انتخاب کنید</p>
+        <p class="sub">هر دو محصول فارسی‌اند، روی سرور خودتان نصب می‌شوند و پنلشان روی گوشی هم کار می‌کند.</p>
+        <div class="actions">
+          {products.map((p, i) => (
+            <a class:list={["btn", i ? "btn-outline" : "btn-green"]} href={href(`/products/${p.id}/`)}>{p.data.name}</a>
+          ))}
+        </div>
+
+        {site.social.length > 0 && (
+          <ul class="social">
+            {site.social.map((s) => <li><a href={s.url} rel="me noopener">{s.name}</a></li>)}
+          </ul>
+        )}
+
+        <div class="meta">
+          <span>© {year} {site.name}</span>
+          {site.email && <a href={`mailto:${site.email}`} dir="ltr">{site.email}</a>}
+          {site.phone && <a href={`tel:${site.phone}`} dir="ltr">{site.phone}</a>}
+          <a href={href("/blog/")}>وبلاگ</a>
+          <a href={href("/contact/")}>تماس</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-footer {
+    padding-block: clamp(64px, 8vw, 96px) 32px;
+    background:
+      radial-gradient(circle at 100% 0, rgba(255, 255, 255, 0.08) 0 35%, transparent 35.2%),
+      var(--blue-grad);
+    color: var(--white);
+    text-align: center;
+  }
+
+  .title {
+    max-inline-size: 22ch;
+    margin-inline: auto;
+    color: var(--white);
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.5;
+  }
+
+  .sub {
+    margin-block-start: 12px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-block-start: 32px;
+  }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 40px;
+    margin: 48px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .social a,
+  .meta a {
+    color: inherit;
+    text-decoration: none;
+    border-block-end: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 32px;
+    margin-block-start: 48px;
+    padding-block-start: 24px;
+    border-block-start: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+  }
+</style>

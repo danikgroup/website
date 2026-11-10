@@ -1,0 +1,97 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import Icon from "../components/Icon.astro";
+import site from "../data/site.json";
+import { breadcrumbs } from "../utils.js";
+
+const jsonLd = [breadcrumbs(Astro.site, [[site.name, "/"], ["تماس", "/contact/"]])];
+
+const ways = [
+  site.phone && { icon: "call", label: "تلفن", value: site.phone, link: `tel:${site.phone}`, ltr: true },
+  site.email && { icon: "mail", label: "ایمیل", value: site.email, link: `mailto:${site.email}`, ltr: true },
+  site.address && { icon: "pin", label: "نشانی", value: site.address },
+].filter(Boolean);
+---
+<Base title="تماس با ما" description={`راه‌های تماس با ${site.name} برای مشاوره و دیدن نسخهٔ نمایشی دانیک مدرسه و دانما.`} jsonLd={jsonLd}>
+  <PageHeader title="تماس با ما" lead="برای دیدن نسخهٔ نمایشی، پرسیدن قیمت یا مشاوره دربارهٔ نرم‌افزار مدرسه یا آموزشگاه‌تان تماس بگیرید." />
+
+  <section class="section">
+    <div class="wrap">
+      {ways.length > 0 ? (
+        <ul class="ways">
+          {ways.map((w) => (
+            <li>
+              <span class="disc"><Icon name={w.icon} size={28} /></span>
+              <b>{w.label}</b>
+              {w.link ? <a href={w.link} dir={w.ltr ? "ltr" : undefined}>{w.value}</a> : <span>{w.value}</span>}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty">اطلاعات تماس هنوز وارد نشده است.</p>
+      )}
+
+      {site.social.length > 0 && (
+        <ul class="social">
+          {site.social.map((s) => <li><a class="btn btn-blue" href={s.url} rel="me noopener">{s.name}</a></li>)}
+        </ul>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 48px 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  .ways li {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+  }
+
+  .disc {
+    display: grid;
+    place-items: center;
+    inline-size: 72px;
+    block-size: 72px;
+    margin-block-end: 10px;
+    border-radius: 22px;
+    background: var(--white);
+    color: var(--blue);
+    box-shadow: var(--shadow);
+  }
+
+  .ways b {
+    color: var(--navy);
+    font-size: 1.15rem;
+  }
+
+  .ways a {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 64px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .empty {
+    text-align: center;
+  }
+</style>

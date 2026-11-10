@@ -1,0 +1,88 @@
+---
+// Template's newsletter band, turned into the demo request (a static site can't take form posts).
+import Device from "./Device.astro";
+import Screen from "./Screen.astro";
+import Icon from "./Icon.astro";
+import site from "../data/site.json";
+import { href } from "../utils.js";
+import { screenLabels } from "../screens.js";
+---
+<section class="demo" aria-labelledby="demo-title">
+  <div class="wrap inner">
+    <Device class="phone" label={screenLabels.notices}>
+      <Screen kind="notices" />
+    </Device>
+    <div class="text">
+      <h2 id="demo-title">نسخهٔ نمایشی را از نزدیک ببینید</h2>
+      <p>
+        با اطلاعات نمونه نشانتان می‌دهیم معلم، اولیا و دفتر مدرسه یا آموزشگاه شما هر روز با پنل چه کار می‌کنند.
+        تماس بگیرید تا زمان جلسه را هماهنگ کنیم.
+      </p>
+      <div class="actions">
+        {site.phone && (
+          <a class="btn btn-navy" href={`tel:${site.phone}`}><Icon name="call" size={18} />تماس: <span dir="ltr">{site.phone}</span></a>
+        )}
+        {site.email && (
+          <a class="btn btn-white" href={`mailto:${site.email}`}><Icon name="mail" size={18} />ارسال ایمیل</a>
+        )}
+        {!site.phone && !site.email && (
+          <a class="btn btn-navy" href={href("/contact/")}><Icon name="send" size={18} />راه‌های تماس</a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .demo {
+    position: relative;
+    margin-block-start: clamp(80px, 12vw, 200px);
+    background:
+      radial-gradient(circle at 0% 100%, rgba(255, 255, 255, 0.18) 0 30%, transparent 30.2%),
+      var(--green-grad);
+    color: var(--navy);
+  }
+
+  .inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: end;
+    gap: clamp(32px, 6vw, 96px);
+  }
+
+  .phone {
+    --device-w: 260px;
+    margin-block-start: clamp(-200px, -14vw, -80px);
+    margin-block-end: clamp(40px, 6vw, 72px);
+    rotate: -4deg;
+  }
+
+  .text {
+    display: grid;
+    gap: 18px;
+    max-inline-size: 34rem;
+    padding-block: clamp(48px, 7vw, 96px);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-block-start: 8px;
+  }
+
+  .btn-white {
+    background: var(--white);
+    color: var(--navy);
+  }
+
+  @media (max-width: 760px) {
+    .inner {
+      grid-template-columns: 1fr;
+    }
+
+    .phone {
+      display: none;
+    }
+  }
+</style>

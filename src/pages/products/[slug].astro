@@ -1,0 +1,166 @@
+---
+import { render } from "astro:content";
+import { Image } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import Hero from "../../components/Hero.astro";
+import Features from "../../components/Features.astro";
+import DemoBand from "../../components/DemoBand.astro";
+import site from "../../data/site.json";
+import { products, breadcrumbs } from "../../utils.js";
+import { phoneLabel } from "../../screens.js";
+import ProductScreen from "../../components/ProductScreen.astro";
+
+export async function getStaticPaths() {
+  return (await products()).map((product) => ({ params: { slug: product.id }, props: { product } }));
+}
+
+const { product } = Astro.props;
+const { data } = product;
+const { Content } = await render(product);
+
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: data.name,
+    ...(data.alternateName && { alternateName: data.alternateName }),
+    description: data.description,
+    applicationCategory: "BusinessApplication",
+    applicationSubCategory: data.category,
+    operatingSystem: "Web",
+    inLanguage: "fa",
+    url: new URL(Astro.url.pathname, Astro.site).href,
+    featureList: data.features.map((f) => f.title),
+    publisher: { "@type": "Organization", name: site.name },
+  },
+  breadcrumbs(Astro.site, [[site.name, "/"], [data.name, `/products/${product.id}/`]]),
+  ...(data.faq.length
+    ? [{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: data.faq.map((f) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answer },
+        })),
+      }]
+    : []),
+];
+---
+<Base title={data.title} description={data.description} image={data.image} imageAlt={data.imageAlt} jsonLd={jsonLd}>
+  <Hero
+    small={data.category}
+    big={data.name}
+    lead={data.tagline}
+    screen={data.screen}
+    screenLabel={phoneLabel(data)}
+    icons={data.features.map((f) => f.icon)}
+    next="#about"
+  >
+    <ProductScreen data={data} eager />
+  </Hero>
+
+  <section id="about" class="section">
+    <div class="prose">
+      <Content />
+    </div>
+    {data.image && (
+      <Image class="shot wrap" src={data.image} alt={data.imageAlt ?? ""} widths={[640, 1200]} sizes="(max-width: 1200px) 100vw, 1200px" />
+    )}
+  </section>
+
+  {data.features.length > 0 && (
+    <section class="section features" aria-labelledby="features">
+      <div class="wrap">
+        <div class="intro">
+          <h2 id="features">امکانات {data.name}</h2>
+        </div>
+        <Features items={data.features} />
+      </div>
+    </section>
+  )}
+
+  {data.faq.length > 0 && (
+    <section class="section" aria-labelledby="faq">
+      <div class="wrap faq">
+        <div class="intro"><h2 id="faq">پرسش‌های پرتکرار</h2></div>
+        {data.faq.map((f) => (
+          <details>
+            <summary>{f.question}</summary>
+            <p>{f.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <DemoBand />
+</Base>
+
+<style>
+  #about {
+    padding-block-end: 0;
+  }
+
+  .prose {
+    padding-inline: var(--gutter);
+    text-align: center;
+    font-size: 1.15rem;
+  }
+
+  .shot {
+    margin-block-start: 64px;
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+  }
+
+  .faq {
+    max-inline-size: 760px;
+  }
+
+  details {
+    border-block-end: 1px solid var(--line);
+  }
+
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-block: 20px;
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Plus that turns into a minus when open. */
+  summary::after {
+    content: "+";
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 36px;
+    block-size: 36px;
+    border-radius: 50%;
+    background: var(--blue-grad);
+    color: var(--white);
+    font-size: 1.3rem;
+    transition: rotate 0.25s;
+  }
+
+  details[open] summary::after {
+    content: "−";
+    rotate: 180deg;
+  }
+
+  details p {
+    padding-block-end: 20px;
+  }
+</style>

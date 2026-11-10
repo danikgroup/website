@@ -1,0 +1,8 @@
+---
+import { icons } from "../icons.js";
+
+// `...rest` carries the parent's scoped-style attribute, so `class` from a parent's <style> applies.
+const { name, size = 24, strokeWidth = 1.6, ...rest } = Astro.props;
+const Lucide = icons[name] ?? icons.module;
+---
+<Lucide size={size} stroke-width={strokeWidth} aria-hidden="true" {...rest} />

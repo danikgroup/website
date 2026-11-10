@@ -1,0 +1,609 @@
+---
+// Template header: nav at the start, logo centred, call to action at the end.
+// «محصولات» is a megamenu after Digikala's: product list on one side, the pointed-at product's
+// picture, description and key features on the other. Under 900px the whole nav is a popover
+// (opened by the menu button) and the megamenu becomes a tap-to-open list of product cards.
+import { Image } from "astro:assets";
+import Icon from "./Icon.astro";
+import Device from "./Device.astro";
+import ProductScreen from "./ProductScreen.astro";
+import logo from "../assets/logo.png";
+import site from "../data/site.json";
+import { href, products as getProducts } from "../utils.js";
+
+const products = await getProducts();
+const current = Astro.url.pathname;
+const inProducts = products.some((p) => current === href(`/products/${p.id}/`));
+const links = [
+  { label: "وبلاگ", path: "/blog/" },
+  { label: "تماس", path: "/contact/" },
+];
+---
+<header class="site-header">
+  <div class="wrap bar">
+    <nav id="site-nav" popover aria-label="منوی اصلی">
+      <button class="close" popovertarget="site-nav" popovertargetaction="hide" aria-label="بستن منو">
+        <Icon name="close" />
+      </button>
+
+      <div class="mega" data-mega>
+        <button
+          class:list={["mega-toggle", { current: inProducts }]}
+          type="button"
+          aria-expanded="false"
+          aria-controls="mega-panel"
+          data-mega-toggle
+        >
+          محصولات <Icon name="chevronDown" size={18} class="chevron" />
+        </button>
+
+        <div class="mega-panel" id="mega-panel">
+          <ul class="mega-card">
+            {products.map((p, i) => (
+              <li data-active={i === 0 ? "" : undefined}>
+                <a
+                  class="mega-item"
+                  href={href(`/products/${p.id}/`)}
+                  aria-current={current === href(`/products/${p.id}/`) ? "page" : undefined}
+                  data-mega-item
+                >
+                  <span class="disc"><Icon name={p.data.features[0]?.icon ?? "module"} size={22} /></span>
+                  <span class="names"><b>{p.data.name}</b><small>{p.data.category}</small></span>
+                  <Icon name="chevronLeft" size={18} class="go" />
+                </a>
+
+                <div class="mega-detail">
+                  <div class="mega-text">
+                    <p>{p.data.description}</p>
+                    <ul class="mega-features">
+                      {p.data.features.slice(0, 4).map((f) => (
+                        <li><Icon name={f.icon} size={18} />{f.title}</li>
+                      ))}
+                    </ul>
+                    <a class="btn btn-blue more" href={href(`/products/${p.id}/`)} tabindex="-1">معرفی کامل {p.data.name}</a>
+                  </div>
+                  <div class="mega-art" aria-hidden="true">
+                    {p.data.image ? (
+                      <Image src={p.data.image} alt="" width={520} />
+                    ) : (
+                      <Device class="mega-phone" label=""><ProductScreen data={p.data} /></Device>
+                    )}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {links.map((l) => (
+        <a class="link" href={href(l.path)} aria-current={current === href(l.path) ? "page" : undefined}>{l.label}</a>
+      ))}
+    </nav>
+
+    <a class="logo" href={href("/")} aria-label={`${site.name}، صفحهٔ اصلی`}>
+      <Image src={logo} alt="" width={64} height={64} densities={[1, 2]} loading="eager" />
+      <span>{site.name}</span>
+    </a>
+
+    <div class="end">
+      <a class="btn btn-green" href={href("/contact/")}>درخواست دمو</a>
+      <button class="menu" popovertarget="site-nav" aria-label="باز کردن منو">
+        <Icon name="menu" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Click/Enter opens the megamenu (hover opens it too, in CSS); Escape, a click outside or
+  // tabbing away closes it. The preview follows the last product pointed at or focused.
+  const desktop = matchMedia("(min-width: 901px)");
+  for (const mega of document.querySelectorAll("[data-mega]")) {
+    const toggle = mega.querySelector("[data-mega-toggle]");
+    const set = (open) => toggle.setAttribute("aria-expanded", String(open));
+
+    toggle.addEventListener("click", () => set(toggle.getAttribute("aria-expanded") !== "true"));
+    mega.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+        e.stopPropagation(); // on phones, keep the menu popover open
+        set(false);
+        toggle.focus();
+      }
+    });
+    mega.addEventListener("focusout", (e) => desktop.matches && !mega.contains(e.relatedTarget) && set(false));
+    document.addEventListener("click", (e) => desktop.matches && !mega.contains(e.target) && set(false));
+
+    for (const item of mega.querySelectorAll("[data-mega-item]")) {
+      const show = () => {
+        mega.querySelector("li[data-active]")?.removeAttribute("data-active");
+        item.parentElement.setAttribute("data-active", "");
+      };
+      item.addEventListener("pointerenter", show);
+      item.addEventListener("focus", show);
+    }
+  }
+</script>
+
+<style>
+  .site-header {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 10;
+    padding-block: 20px;
+  }
+
+  .bar {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    color: var(--navy);
+    font-weight: 800;
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+
+  .end {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Desktop: the popover nav sits inline, always shown. */
+  nav[popover] {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    position: static;
+    inset: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+    inline-size: auto;
+    block-size: auto;
+    color: inherit;
+  }
+
+  .link,
+  .mega-toggle {
+    padding-block: 6px;
+    border: 0;
+    border-block-end: 2px solid transparent;
+    background: none;
+    color: var(--navy);
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .link:hover,
+  .link[aria-current="page"],
+  .mega-toggle.current,
+  .mega-toggle[aria-expanded="true"] {
+    border-block-end-color: var(--green);
+  }
+
+  .mega-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .chevron {
+    transition: rotate 0.25s;
+  }
+
+  .mega-toggle[aria-expanded="true"] .chevron {
+    rotate: 180deg;
+  }
+
+  /* ----- Megamenu, desktop -----
+     Keeping hover on the way to the panel:
+     1. .mega fills the bar's full height, so moving straight down from «محصولات» never leaves it
+        (the bar is as tall as the logo, much taller than the toggle);
+     2. the panel's top padding bridges the bar's bottom edge to the card;
+     3. closing waits a moment (hover intent), so a diagonal shortcut across the logo area doesn't
+        close it: the panel stays visible, and hoverable, during the delay. */
+  nav[popover] {
+    align-self: stretch;
+  }
+
+  .mega {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+  }
+
+  .mega-panel {
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline: 0;
+    padding-block-start: 14px;
+    visibility: hidden;
+    opacity: 0;
+    translate: 0 -8px;
+    transition:
+      opacity 0.2s ease 0.3s,
+      translate 0.2s ease 0.3s,
+      visibility 0s linear 0.5s;
+  }
+
+  .mega-toggle[aria-expanded="true"] + .mega-panel {
+    visibility: visible;
+    opacity: 1;
+    translate: 0 0;
+    transition-delay: 0s;
+  }
+
+  @media (min-width: 901px) and (hover: hover) {
+    .mega:hover .mega-panel {
+      visibility: visible;
+      opacity: 1;
+      translate: 0 0;
+      transition-delay: 0s;
+    }
+
+    .mega:hover .chevron {
+      rotate: 180deg;
+    }
+  }
+
+  /* The card: product list down the start side, the active product's detail beside it. */
+  .mega-card {
+    --list-w: 290px;
+    position: relative;
+    min-block-size: 360px;
+    margin: 0;
+    padding: 16px;
+    list-style: none;
+    border-radius: 28px;
+    background: var(--white);
+    box-shadow: 0 30px 70px rgba(7, 65, 154, 0.2);
+  }
+
+  .mega-card > li {
+    inline-size: var(--list-w);
+  }
+
+  .mega-card > li + li {
+    margin-block-start: 6px;
+  }
+
+  .mega-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    color: var(--navy);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .disc {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 44px;
+    block-size: 44px;
+    border-radius: 14px;
+    background: #e8efff;
+    color: var(--blue);
+  }
+
+  .names {
+    display: grid;
+    line-height: 1.5;
+  }
+
+  .names b {
+    font-size: 1.05rem;
+  }
+
+  .names small {
+    color: var(--muted);
+  }
+
+  .go {
+    margin-inline-start: auto;
+    color: var(--muted);
+    opacity: 0;
+    translate: 6px 0;
+    transition: opacity 0.2s, translate 0.2s;
+  }
+
+  li[data-active] > .mega-item {
+    background: #f1f5ff;
+  }
+
+  li[data-active] .go {
+    opacity: 1;
+    translate: 0 0;
+    color: var(--blue);
+  }
+
+  .mega-detail {
+    display: none;
+    position: absolute;
+    inset-block: 16px;
+    inset-inline-start: calc(var(--list-w) + 40px);
+    inset-inline-end: 16px;
+    grid-template-columns: 1fr minmax(200px, 250px);
+    align-items: center;
+    gap: 32px;
+  }
+
+  .mega-card::before {
+    /* Divider between the list and the detail. */
+    content: "";
+    position: absolute;
+    inset-block: 28px;
+    inset-inline-start: calc(var(--list-w) + 24px);
+    border-inline-start: 1px solid var(--line);
+  }
+
+  li[data-active] .mega-detail {
+    display: grid;
+    animation: mega-swap 0.3s ease-out;
+  }
+
+  @keyframes mega-swap {
+    from {
+      opacity: 0;
+      translate: -10px 0;
+    }
+  }
+
+  .mega-text {
+    display: grid;
+    gap: 16px;
+    justify-items: start;
+  }
+
+  .mega-text p {
+    max-inline-size: 48ch;
+  }
+
+  .mega-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--navy);
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  .mega-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mega-features :global(svg) {
+    flex: none;
+    color: var(--green-2);
+  }
+
+  /* Picture: the product image, or its phone rising out of green rings as in the hero. */
+  .mega-art {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    align-self: stretch;
+    overflow: hidden;
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at 50% 135%, #12bb89 0 38%, #13cf97 38% 52%, #2ae8b0 52% 66%, transparent 66.2%),
+      var(--grey);
+  }
+
+  .mega-art img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .mega-phone {
+    zoom: 0.6;
+    margin-block-start: 44px;
+  }
+
+  /* ----- Phone and tablet ----- */
+  .menu,
+  .close {
+    display: none;
+    place-items: center;
+    inline-size: 48px;
+    block-size: 48px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--navy);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+  }
+
+  @media (max-width: 900px) {
+    .bar {
+      grid-template-columns: auto 1fr;
+    }
+
+    .logo img {
+      inline-size: 48px;
+      block-size: 48px;
+    }
+
+    .logo {
+      grid-row: 1;
+      grid-template-columns: auto auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .end .btn {
+      display: none;
+    }
+
+    .menu {
+      display: grid;
+    }
+
+    nav[popover] {
+      position: fixed;
+      inset: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: 96px var(--gutter) 40px;
+      overflow-y: auto;
+      background: var(--white);
+      font-size: 1.15rem;
+    }
+
+    nav[popover]:not(:popover-open) {
+      display: none;
+    }
+
+    .close {
+      display: grid;
+      position: absolute;
+      inset-block-start: 20px;
+      inset-inline-end: var(--gutter);
+    }
+
+    .link,
+    .mega-toggle {
+      inline-size: 100%;
+      padding-block: 16px;
+      border-block-end: 1px solid var(--line);
+      text-align: start;
+      font-weight: 700;
+    }
+
+    .mega-toggle {
+      justify-content: space-between;
+    }
+
+    .link[aria-current="page"],
+    .mega-toggle.current,
+    .mega-toggle[aria-expanded="true"] {
+      border-block-end-color: var(--line);
+      color: var(--blue);
+    }
+
+    /* Collapsed until tapped; without the script it simply stays open. */
+    .mega {
+      display: block;
+    }
+
+    .mega-panel {
+      display: block;
+      position: static;
+      padding: 0;
+      visibility: visible;
+      opacity: 1;
+      translate: none;
+      transition: none;
+    }
+
+    :global(.js) .mega-toggle[aria-expanded="false"] + .mega-panel {
+      display: none;
+    }
+
+    .mega-card {
+      display: grid;
+      gap: 12px;
+      min-block-size: 0;
+      padding: 12px 0 20px;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .mega-card::before {
+      content: none;
+    }
+
+    .mega-card > li {
+      inline-size: auto;
+      border-radius: 22px;
+      background: #f6f8fc;
+      overflow: hidden;
+    }
+
+    .mega-card > li + li {
+      margin: 0;
+    }
+
+    li[data-active] > .mega-item {
+      background: none;
+    }
+
+    .go {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    /* Every card shows its detail: picture beside a short description. */
+    .mega-detail,
+    li[data-active] .mega-detail {
+      display: grid;
+      position: static;
+      grid-template-columns: minmax(0, 1fr) 96px;
+      gap: 14px;
+      padding: 0 14px 14px;
+      animation: none;
+    }
+
+    .mega-text {
+      gap: 10px;
+    }
+
+    .mega-text p {
+      font-size: 0.92rem;
+      line-height: 1.8;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .mega-features {
+      display: none;
+    }
+
+    .more {
+      max-inline-size: 100%;
+      white-space: normal;
+      text-align: center;
+      min-block-size: 40px;
+      padding: 6px 18px;
+      font-size: 0.85rem;
+    }
+
+    .mega-art {
+      block-size: 140px;
+      border-radius: 18px;
+    }
+
+    .mega-phone {
+      zoom: 0.36;
+      margin-block-start: 40px;
+    }
+  }
+</style>

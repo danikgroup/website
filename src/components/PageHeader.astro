@@ -1,0 +1,28 @@
+---
+// Grey opener for inner pages (blog, contact, 404): the hero's background without the phone.
+const { title, lead } = Astro.props;
+---
+<section class="page-header">
+  <div class="wrap">
+    <h1>{title}</h1>
+    {lead && <p>{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-header {
+    padding-block: clamp(150px, 18vw, 200px) clamp(72px, 9vw, 112px);
+    background: radial-gradient(ellipse 120% 100% at 50% 0, var(--grey) 99.6%, var(--white) 100%);
+    text-align: center;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+  }
+
+  p {
+    max-inline-size: 36rem;
+    margin: 16px auto 0;
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+import { Image } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import site from "../../data/site.json";
+import { href, faDate, posts, breadcrumbs } from "../../utils.js";
+
+const list = await posts();
+const jsonLd = [breadcrumbs(Astro.site, [[site.name, "/"], ["وبلاگ", "/blog/"]])];
+---
+<Base title="وبلاگ" description={`نوشته‌های ${site.name} دربارهٔ مدیریت مدرسه و آموزشگاه و تازه‌های محصولات.`} jsonLd={jsonLd}>
+  <PageHeader title="وبلاگ" lead="نوشته‌هایی دربارهٔ ادارهٔ مدرسه و آموزشگاه و تازه‌های دانیک مدرسه و دانما." />
+
+  <section class="section">
+    <div class="wrap">
+      {list.length === 0 ? (
+        <p class="empty">هنوز نوشته‌ای منتشر نشده است.</p>
+      ) : (
+        <ul class="posts">
+          {list.map((post) => (
+            <li>
+              {post.data.image && (
+                <Image src={post.data.image} alt={post.data.imageAlt ?? ""} width={640} />
+              )}
+              <time datetime={post.data.date.toISOString()}>{faDate(post.data.date)}</time>
+              <h2><a href={href(`/blog/${post.id}/`)}>{post.data.title}</a></h2>
+              <p>{post.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .empty {
+    text-align: center;
+  }
+
+  .posts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 56px 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: grid;
+    gap: 8px;
+    align-content: start;
+  }
+
+  img {
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    margin-block-end: 12px;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  time {
+    font-size: 0.9rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  h2 a {
+    color: var(--navy);
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--blue);
+  }
+</style>

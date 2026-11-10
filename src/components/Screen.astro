@@ -1,0 +1,382 @@
+---
+// Stylised panel screens drawn in HTML for the phone mockups (crisp, no image weight).
+// They show what each feature does; they are not screenshots of the real panel.
+import Icon from "./Icon.astro";
+
+const { kind } = Astro.props;
+
+const roll = [
+  ["آرش رحیمی", "present"],
+  ["سارا کاظمی", "present"],
+  ["نیما فرهادی", "absent"],
+  ["مهسا نوری", "late"],
+  ["کیان شریفی", "present"],
+  ["یاسمن مرادی", "present"],
+];
+const status = { present: "حاضر", absent: "غایب", late: "تأخیر" };
+
+const marks = [
+  ["ریاضی", "۱۸٫۵"],
+  ["علوم تجربی", "۱۹"],
+  ["فارسی", "۱۷٫۲۵"],
+  ["زبان انگلیسی", "۲۰"],
+  ["مطالعات اجتماعی", "۱۸"],
+];
+
+const instalments = [
+  ["قسط اول", "۱۵ مهر", "۴٬۰۰۰٬۰۰۰", "paid"],
+  ["قسط دوم", "۱۵ آبان", "۴٬۰۰۰٬۰۰۰", "paid"],
+  ["قسط سوم", "۱۵ آذر", "۴٬۰۰۰٬۰۰۰", "due"],
+];
+
+const days = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه"];
+const week = [
+  ["ریاضی", "عربی", "علوم", "ورزش"],
+  ["فارسی", "ریاضی", "زبان", "هنر"],
+  ["علوم", "قرآن", "ریاضی", "فارسی"],
+  ["زبان", "علوم", "مطالعات", "ریاضی"],
+  ["ریاضی", "فارسی", "کار و فناوری", "علوم"],
+];
+const tone = { ریاضی: "a", علوم: "b", فارسی: "c", زبان: "d" };
+
+const notices = [
+  ["attendance", "غیبت", "نیما امروز زنگ دوم غایب بود."],
+  ["report", "کارنامه", "کارنامهٔ نوبت اول منتشر شد."],
+  ["money", "قسط", "قسط سوم شهریه تا سه روز دیگر سررسید است."],
+  ["exam", "آزمون", "آزمون ریاضی پنجشنبه ساعت ۱۰ برگزار می‌شود."],
+];
+---
+<div class="app">
+  {kind === "rollcall" && (
+    <>
+      <header><b>حضور و غیاب</b><small>هفتم ۲، زنگ دوم</small></header>
+      <ul class="rows">
+        {roll.map(([name, s], i) => (
+          <li><span class="avatar">{name[0]}</span>{name}<em class:list={[s, "live mark-in"]} style={`--i: ${i}`}>{status[s]}</em></li>
+        ))}
+      </ul>
+      <div class="cta live glow" style={`--i: ${roll.length}`}>ثبت حضور و غیاب</div>
+    </>
+  )}
+
+  {kind === "report" && (
+    <>
+      <header><b>کارنامهٔ نوبت اول</b><small>سارا کاظمی، پایهٔ هشتم</small></header>
+      <ul class="rows">
+        {marks.map(([subject, mark], i) => <li>{subject}<em class="mark live mark-in" style={`--i: ${i}`}>{mark}</em></li>)}
+      </ul>
+      <div class="total live rise" style={`--i: ${marks.length}`}>معدل <strong>۱۸٫۵۵</strong></div>
+    </>
+  )}
+
+  {kind === "tuition" && (
+    <>
+      <header><b>شهریهٔ دورهٔ رباتیک</b><small>کیان شریفی</small></header>
+      <div class="balance"><small>مانده</small><strong>۴٬۰۰۰٬۰۰۰ تومان</strong></div>
+      <ul class="rows">
+        {instalments.map(([title, date, amount, s], i) => (
+          <li><span>{title}<small>{date}</small></span><em class:list={[s === "paid" ? "present" : "late", "live mark-in"]} style={`--i: ${i}`}>{s === "paid" ? "پرداخت شد" : amount}</em></li>
+        ))}
+      </ul>
+      <div class="cta live glow" style={`--i: ${instalments.length}`}>پرداخت آنلاین</div>
+    </>
+  )}
+
+  {kind === "timetable" && (
+    <>
+      <header><b>برنامهٔ هفتگی</b><small>کلاس نهم ۱</small></header>
+      <div class="grid">
+        {days.map((day, i) => (
+          <>
+            <span class="day">{day}</span>
+            {week[i].map((s, j) => <span class:list={["slot", tone[s], "live fill"]} style={`--i: ${i * 4 + j}`}>{s}</span>)}
+          </>
+        ))}
+      </div>
+    </>
+  )}
+
+  {kind === "notices" && (
+    <>
+      <header><b>اعلان‌ها</b><small>۴ اعلان تازه</small></header>
+      <ul class="notices">
+        {notices.map(([icon, title, text], i) => (
+          <li class="live arrive" style={`--i: ${i}`}><span class="disc"><Icon name={icon} size={14} /></span><span><b>{title}</b>{text}</span></li>
+        ))}
+      </ul>
+    </>
+  )}
+</div>
+
+<style>
+  /* Each screen acts out its feature once its phone scrolls into view (.is-live on Device).
+     Start states live only in keyframes, so with no JS or reduced motion the final screen shows. */
+  :global(.js) .live {
+    animation: var(--anim) 0.5s cubic-bezier(0.3, 1.4, 0.6, 1) both paused;
+    animation-delay: calc(var(--base, 0.4s) + var(--i, 0) * var(--step, 0.22s));
+  }
+
+  :global(.is-live) .live {
+    animation-play-state: running;
+  }
+
+  .mark-in {
+    --anim: screen-mark;
+  }
+
+  .rise {
+    --anim: screen-rise;
+  }
+
+  .glow {
+    --anim: screen-glow;
+    animation-duration: 1.2s !important;
+    animation-timing-function: ease-out !important;
+  }
+
+  .fill {
+    --anim: screen-fill;
+    --step: 0.045s;
+  }
+
+  .arrive {
+    --anim: screen-arrive;
+    --step: 0.45s;
+  }
+
+  @keyframes screen-mark {
+    from {
+      opacity: 0;
+      scale: 0.3;
+    }
+  }
+
+  @keyframes screen-rise {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+  }
+
+  @keyframes screen-glow {
+    0% {
+      box-shadow: 0 0 0 0 rgba(20, 226, 164, 0.7);
+    }
+
+    100% {
+      box-shadow: 0 0 0 14px rgba(20, 226, 164, 0);
+    }
+  }
+
+  @keyframes screen-fill {
+    from {
+      opacity: 0;
+      scale: 0.6;
+    }
+  }
+
+  @keyframes screen-arrive {
+    from {
+      opacity: 0;
+      translate: 0 -24px;
+      scale: 0.96;
+    }
+  }
+
+  .app {
+    display: grid;
+    gap: 10px;
+    padding: 8px 14px 16px;
+  }
+
+  header {
+    display: grid;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: var(--blue-grad);
+    color: var(--white);
+  }
+
+  header b {
+    font-size: 14px;
+  }
+
+  header small {
+    opacity: 0.85;
+  }
+
+  .rows,
+  .notices {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rows li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    background: var(--white);
+    font-weight: 500;
+  }
+
+  .rows li span:not(.avatar) {
+    display: grid;
+  }
+
+  .rows small {
+    color: var(--muted);
+    font-size: 9.5px;
+  }
+
+  .avatar {
+    display: grid;
+    place-items: center;
+    inline-size: 22px;
+    block-size: 22px;
+    border-radius: 50%;
+    background: #e8efff;
+    color: var(--blue);
+    font-weight: 700;
+  }
+
+  em {
+    margin-inline-start: auto;
+    padding: 1px 10px;
+    border-radius: 20px;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 10px;
+  }
+
+  .present {
+    background: #dcfaf0;
+    color: #0b7a59;
+  }
+
+  .absent {
+    background: #ffe3e3;
+    color: #b42318;
+  }
+
+  .late {
+    background: #fff1d6;
+    color: #95600a;
+  }
+
+  .mark {
+    background: #e8efff;
+    color: var(--blue);
+    font-size: 11px;
+  }
+
+  .cta,
+  .total,
+  .balance {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 14px;
+    font-weight: 700;
+  }
+
+  .cta {
+    background: var(--green-grad);
+  }
+
+  .total {
+    background: var(--white);
+    font-size: 12px;
+  }
+
+  .total strong {
+    color: var(--blue);
+    font-size: 16px;
+  }
+
+  .balance {
+    flex-direction: column;
+    gap: 0;
+    background: var(--white);
+  }
+
+  .balance small {
+    color: var(--muted);
+  }
+
+  .balance strong {
+    font-size: 15px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: auto repeat(4, 1fr);
+    gap: 4px;
+    font-size: 9px;
+  }
+
+  .day {
+    align-self: center;
+    font-weight: 700;
+  }
+
+  .slot {
+    display: grid;
+    place-items: center;
+    min-block-size: 40px;
+    padding: 2px;
+    border-radius: 8px;
+    background: var(--white);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .slot.a {
+    background: #e8efff;
+    color: var(--blue);
+  }
+
+  .slot.b {
+    background: #dcfaf0;
+    color: #0b7a59;
+  }
+
+  .slot.c {
+    background: #fff1d6;
+    color: #95600a;
+  }
+
+  .slot.d {
+    background: #f1e8ff;
+    color: #6b3fc1;
+  }
+
+  .notices li {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 14px;
+    background: var(--white);
+  }
+
+  .notices li > span:last-child {
+    display: grid;
+  }
+
+  .disc {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 28px;
+    block-size: 28px;
+    border-radius: 50%;
+    background: #e8efff;
+    color: var(--blue);
+  }
+</style>
