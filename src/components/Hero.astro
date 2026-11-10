@@ -17,8 +17,53 @@ const angle = (i) => {
   const deg = side < 2 ? 35 : 52 - (34 * j) / (side - 1);
   return i < side ? -deg : deg;
 };
+
+// Depth field around the headline: [left %, top %, depth, icon | {chip}]. Depth 1 is the focal
+// plane (the phone); below 1 is behind it, above 1 in front of the lens. The further an item is
+// from the focal plane, the more it blurs; far ones are also smaller and fainter.
+const field = [
+  [9, 20, 0.2, "book"],
+  [86, 15, 0.25, "calendar"],
+  [27, 12, 0.3, "school"],
+  [70, 11, 0.3, "chart"],
+  [3, 46, 0.22, "users"],
+  [95, 51, 0.28, "language"],
+  [14, 36, 0.55, "class"],
+  [83, 33, 0.6, "shield"],
+  [20, 58, 0.5, { chip: "grade", text: "۲۰" }],
+  [78, 56, 0.55, { chip: "present", text: "حاضر" }],
+  [6, 70, 0.85, "award"],
+  [91, 73, 0.9, "phone"],
+  [-3, 26, 1.5, "video"],
+  [94, 86, 1.6, "receipt"],
+].map(([x, y, d, what], i) => ({
+  what,
+  layer: d > 1 ? "front" : d < 0.4 ? "far" : "mid",
+  size: Math.round(30 + d * 40),
+  style: [
+    `--x: ${x}%`,
+    `--y: ${y}%`,
+    `--d: ${d}`,
+    `--s: ${Math.round(30 + d * 40)}px`,
+    `--blur: ${(d > 1 ? (d - 1) * 14 : (1 - d) * 4.5).toFixed(1)}px`,
+    `--o: ${d > 1 ? 0.75 : Math.min(1, 0.5 + d * 0.5).toFixed(2)}`,
+    `--i: ${i}`,
+  ].join("; "),
+}));
 ---
 <section class="hero" data-parallax>
+  <ul class="field" aria-hidden="true">
+    {field.map(({ what, layer, size, style }, i) => (
+      <li class={layer} style={style}>
+        {typeof what === "string" ? (
+          <span class:list={["tile", i % 2 ? "green" : "blue"]}><Icon name={what} size={Math.round(size * 0.42)} /></span>
+        ) : (
+          <span class:list={["tile", "chip", what.chip]}>{what.text}</span>
+        )}
+      </li>
+    ))}
+  </ul>
+
   <div class="wrap text">
     <h1><span class="line small">{small}</span> <span class="line big">{big}</span></h1>
     {lead && <p>{lead}</p>}
@@ -46,6 +91,7 @@ const angle = (i) => {
     background: radial-gradient(ellipse 130% 74% at 50% 0, var(--grey) 99.6%, var(--white) 100%);
     text-align: center;
     isolation: isolate;
+    overflow-x: clip; /* field items sit partly off the sides */
   }
 
   /* Squared exercise-book paper behind the headline (the template's dot texture, made the
@@ -69,6 +115,73 @@ const angle = (i) => {
   .hero::after {
     background: var(--paper-major);
     translate: calc(-50% + var(--px, 0) * -18px) calc(var(--py, 0) * -12px);
+  }
+
+  /* ----- Depth field ----- */
+  .field {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+  }
+
+  /* Pointer parallax pivots on the focal plane: far items drift against the pointer, front ones
+     with it, the phone (depth 1) barely moves. */
+  .field li {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    z-index: -1;
+    inline-size: var(--s);
+    block-size: var(--s);
+    filter: blur(var(--blur));
+    opacity: var(--o);
+    translate: calc(var(--px, 0) * (var(--d) - 1) * 36px) calc(var(--py, 0) * (var(--d) - 1) * 22px);
+    transition: translate 0.9s ease-out;
+    animation: field-in 1.4s ease-out both;
+    animation-delay: calc(0.1s + var(--d) * 0.5s);
+  }
+
+  .field li.front {
+    z-index: 4;
+  }
+
+  /* Far items float slower than near ones, as distant things seem to. */
+  .field .tile {
+    border-radius: calc(var(--s) * 0.28);
+    animation-duration: calc(4s + (1.6 - var(--d)) * 4s);
+    animation-delay: calc(var(--i) * -1.3s);
+  }
+
+  .field .green {
+    color: var(--green-2);
+  }
+
+  .chip {
+    font-weight: 800;
+    color: var(--navy);
+  }
+
+  .grade {
+    border-radius: 50%;
+    color: var(--blue);
+    font-size: calc(var(--s) * 0.38);
+  }
+
+  .present {
+    inline-size: calc(var(--s) * 1.6);
+    border-radius: 50px;
+    color: #0b8a62;
+    font-size: calc(var(--s) * 0.3);
+  }
+
+  @keyframes field-in {
+    from {
+      opacity: 0;
+      scale: 0.85;
+    }
   }
 
   h1 {
@@ -365,9 +478,15 @@ const angle = (i) => {
       block-size: 400px;
     }
 
-    /* No room beside the phone on a narrow screen. */
-    .tiles {
+    /* No room beside the phone on a narrow screen. The field keeps only its faint far layer,
+       smaller, so nothing sharp competes with the headline. */
+    .tiles,
+    .field li:not(.far) {
       display: none;
+    }
+
+    .field li {
+      scale: 0.7;
     }
   }
 </style>
