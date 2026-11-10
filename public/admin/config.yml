@@ -1,0 +1,144 @@
+# Sveltia CMS. Fields mirror src/content.config.js; change both together.
+# Editors sign in with a GitHub personal access token (contents: read/write on this repo).
+backend:
+  name: github
+  repo: danikgroup/website
+  branch: main
+
+# Images live under src/assets so Astro optimises them. public_folder is the path
+# written into the Markdown, relative to the entry file.
+media_folder: src/assets/uploads
+public_folder: ../../assets/uploads
+
+collections:
+  - name: posts
+    label: نوشته‌ها
+    label_singular: نوشته
+    folder: src/content/posts
+    create: true
+    slug: "{{fields._slug}}"
+    media_folder: /src/assets/posts
+    public_folder: ../../assets/posts
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: عنوان, widget: string }
+      - { name: description, label: توضیح کوتاه (برای گوگل، حداکثر ۱۷۰ نویسه), widget: text, pattern: ['^[\s\S]{1,170}$', "حداکثر ۱۷۰ نویسه"] }
+      - { name: date, label: تاریخ انتشار, widget: datetime, time_format: false }
+      - { name: updated, label: تاریخ به‌روزرسانی, widget: datetime, time_format: false, required: false }
+      - { name: image, label: تصویر, widget: image, required: false }
+      - { name: imageAlt, label: متن جایگزین تصویر, widget: string, required: false }
+      - { name: draft, label: پیش‌نویس, widget: boolean, default: false }
+      - { name: body, label: متن, widget: markdown }
+
+  - name: products
+    label: محصولات
+    label_singular: محصول
+    folder: src/content/products
+    create: true
+    slug: "{{fields._slug}}"
+    media_folder: /src/assets/products
+    public_folder: ../../assets/products
+    sortable_fields: [order, name]
+    fields:
+      - { name: name, label: نام محصول, widget: string }
+      - { name: alternateName, label: نام لاتین, widget: string, required: false }
+      - { name: category, label: دسته (سطر کوچک بالای نام، مثل «نرم‌افزار مدیریت مدرسه»), widget: string }
+      - { name: title, label: عنوان صفحه (برای گوگل), widget: string }
+      - { name: description, label: توضیح کوتاه (برای گوگل، حداکثر ۱۷۰ نویسه), widget: text, pattern: ['^[\s\S]{1,170}$', "حداکثر ۱۷۰ نویسه"] }
+      - { name: tagline, label: شعار, widget: string }
+      # Same keys as src/screens.js.
+      - name: screen
+        label: صفحهٔ نمونه روی گوشی
+        widget: select
+        default: rollcall
+        options:
+          - { label: حضور و غیاب, value: rollcall }
+          - { label: کارنامه, value: report }
+          - { label: شهریه و اقساط, value: tuition }
+          - { label: برنامهٔ هفتگی, value: timetable }
+          - { label: اعلان‌ها, value: notices }
+      - { name: screenshot, label: "اسکرین‌شات گوشی (جای صفحهٔ نمونه؛ عمودی، مثل ۱۳۲۰×۲۸۶۸)", widget: image, required: false }
+      - { name: screenshotAlt, label: توضیح اسکرین‌شات (برای نابینایان و گوگل), widget: string, required: false }
+      - { name: order, label: ترتیب نمایش, widget: number, value_type: int, default: 0 }
+      - { name: image, label: تصویر, widget: image, required: false }
+      - { name: imageAlt, label: متن جایگزین تصویر, widget: string, required: false }
+      - { name: draft, label: پیش‌نویس, widget: boolean, default: false }
+      - name: features
+        label: امکانات
+        widget: list
+        required: false
+        fields:
+          # Same keys as src/icons.js and ICON_NAMES in src/content.config.js.
+          - name: icon
+            label: آیکون
+            widget: select
+            default: module
+            options:
+              - { label: تقویم, value: calendar }
+              - { label: برنامهٔ هفتگی, value: timetable }
+              - { label: حضور و غیاب, value: attendance }
+              - { label: آزمون, value: exam }
+              - { label: کارنامه, value: report }
+              - { label: فارغ‌التحصیلی, value: graduation }
+              - { label: کیف پول / شهریه, value: money }
+              - { label: رسید, value: receipt }
+              - { label: پیام, value: message }
+              - { label: اعلان, value: bell }
+              - { label: گوشی, value: phone }
+              - { label: سرور, value: server }
+              - { label: پشتیبان‌گیری, value: backup }
+              - { label: ورود از فایل, value: import }
+              - { label: تنظیمات, value: settings }
+              - { label: کاربران, value: users }
+              - { label: مدرسه, value: school }
+              - { label: کلاس, value: class }
+              - { label: کتاب, value: book }
+              - { label: ویدیو, value: video }
+              - { label: فروشگاه, value: shop }
+              - { label: بلیت, value: ticket }
+              - { label: نمودار, value: chart }
+              - { label: گواهی, value: award }
+              - { label: امنیت, value: shield }
+              - { label: زبان, value: language }
+              - { label: بخش / ماژول, value: module }
+              - { label: دوربین, value: camera }
+          - { name: title, label: عنوان, widget: string }
+          - { name: text, label: توضیح, widget: text }
+      - name: faq
+        label: پرسش‌های پرتکرار
+        widget: list
+        required: false
+        fields:
+          - { name: question, label: پرسش, widget: string }
+          - { name: answer, label: پاسخ, widget: text }
+      - { name: body, label: معرفی, widget: markdown }
+
+  - name: settings
+    label: تنظیمات
+    files:
+      - name: site
+        label: اطلاعات سایت و تماس
+        file: src/data/site.json
+        fields:
+          - { name: name, label: نام, widget: string }
+          - { name: alternateName, label: نام لاتین, widget: string }
+          - { name: description, label: معرفی کوتاه, widget: text }
+          - { name: phone, label: تلفن, widget: string, required: false }
+          - { name: email, label: ایمیل, widget: string, required: false }
+          - { name: address, label: نشانی, widget: text, required: false }
+          - name: social
+            label: شبکه‌های اجتماعی
+            widget: list
+            required: false
+            fields:
+              - { name: name, label: نام, widget: string }
+              - { name: url, label: نشانی, widget: string }
+          # Shown on the home page only when at least one is entered. Real quotes only.
+          - name: testimonials
+            label: نظر مشتریان
+            widget: list
+            required: false
+            fields:
+              - { name: name, label: نام, widget: string }
+              - { name: role, label: سمت و مجموعه, widget: string }
+              - { name: text, label: متن نظر, widget: text }
