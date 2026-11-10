@@ -13,8 +13,29 @@
 
   --blue-grad: linear-gradient(135deg, #1257c9 0%, #1469eb 100%);
   --green-grad: linear-gradient(135deg, #14e2a4 0%, #14c691 100%);
-  --shadow: 0 20px 50px rgba(7, 65, 154, 0.16);
-  --shadow-strong: 0 15px 35px rgba(7, 65, 154, 0.25);
+  /* Depth: one light source, from above. Every raised thing gets a contact shadow (tight, dark)
+     under an ambient one (wide, soft), and a 1px highlight on its top edge (--rim). */
+  --shadow:
+    0 2px 4px rgba(20, 18, 43, 0.06),
+    0 12px 24px -8px rgba(7, 65, 154, 0.14),
+    0 32px 64px -16px rgba(7, 65, 154, 0.2);
+  --shadow-strong:
+    0 2px 4px rgba(20, 18, 43, 0.1),
+    0 10px 20px -6px rgba(7, 65, 154, 0.3),
+    0 24px 48px -12px rgba(7, 65, 154, 0.3);
+  --rim: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  /* Fine film grain, layered over colour bands so gradients read as material, not flat vector. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+
+  /* Squared exercise-book paper (دفتر شطرنجی): fine squares, and every fourth line a shade darker. */
+  --paper-ink: rgba(20, 105, 235, 0.07);
+  --paper:
+    linear-gradient(var(--paper-ink) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, var(--paper-ink) 1px, transparent 1px) 0 0 / 24px 24px;
+  --paper-major:
+    linear-gradient(var(--paper-ink) 1px, transparent 1px) 0 0 / 96px 96px,
+    linear-gradient(90deg, var(--paper-ink) 1px, transparent 1px) 0 0 / 96px 96px;
 
   --wrap: 1200px;
   --gutter: clamp(16px, 4vw, 32px);
@@ -124,16 +145,24 @@ svg {
   transform: translateY(-2px);
 }
 
+.btn:active {
+  transform: translateY(1px);
+  transition-duration: 0.05s;
+}
+
 .btn-green {
   background: var(--green-grad);
   color: var(--navy);
-  box-shadow: 0 10px 25px rgba(7, 119, 86, 0.25);
+  box-shadow:
+    var(--rim),
+    0 2px 4px rgba(7, 90, 66, 0.15),
+    0 12px 24px -8px rgba(7, 119, 86, 0.4);
 }
 
 .btn-blue {
   background: var(--blue-grad);
   color: var(--white);
-  box-shadow: var(--shadow-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), var(--shadow-strong);
 }
 
 .btn-outline {

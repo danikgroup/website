@@ -11,10 +11,22 @@ const { title, lead } = Astro.props;
 </section>
 
 <style>
+  /* Same squared paper as the home hero, fading out from behind the title. */
   .page-header {
+    position: relative;
+    isolation: isolate;
     padding-block: clamp(150px, 18vw, 200px) clamp(72px, 9vw, 112px);
     background: radial-gradient(ellipse 120% 100% at 50% 0, var(--grey) 99.6%, var(--white) 100%);
     text-align: center;
+  }
+
+  .page-header::before {
+    content: "";
+    position: absolute;
+    inset: 40px 0 0;
+    background: var(--paper);
+    mask-image: radial-gradient(ellipse 45% 70% at 50% 45%, #000, transparent);
+    z-index: -1;
   }
 
   h1 {

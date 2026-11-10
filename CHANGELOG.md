@@ -36,6 +36,9 @@ Format (based on Keep a Changelog: https://keepachangelog.com/en/1.1.0/):
 - Add a «محصولات» megamenu in the header (Digikala-style list + preview with picture, description and key features; tap-to-open product cards on phones) and move the product links into it.
 - Add a `screen` field to products choosing their phone mockup, replacing per-page mappings.
 - Show real phone screenshots of Danik School and DanMa in their product phones (home sections, product hero, megamenu), via a new optional `screenshot` product field; drawn screens remain the fallback.
+- Give the site depth: one light source (layered contact + ambient shadows, a top-edge highlight, lit phone bezels), fine grain on the green and blue bands, and squared exercise-book paper behind the hero and page titles, in two layers that slide apart with the pointer.
+- Turn the hero rings into a lit stepped dome with rim highlights and a glow; the hero phone now turns in 3D toward the pointer with a glare across its glass (one sweep on load), and the icon tiles are glass with depth of field (far ones smaller, softer, behind the dome).
+- Stand the product phones in 3D on a lit disc with two orbit lines; on scroll each turns from its text toward the reader while the disc drifts slower (scroll-driven CSS, static where unsupported or with reduced motion). Fact panels get light, grain and dividers; the product chooser gets blueprint squares and glass cards.
 
 ### Fixed
 - Fix the home page laying out wider than phone screens while product phones waited to swing in.

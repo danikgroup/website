@@ -17,6 +17,10 @@ Tokens live in `src/styles/global.css` and come from the template's CSS: navy `#
 departures, both for contrast: text on green is navy, never white, and the blue gradient's light end
 is darker than the template's.
 
+- Depth comes from one light source above: `--shadow`/`--shadow-strong` (contact + ambient layers),
+  `--rim` (top-edge highlight), `--grain` (film grain layered over colour bands) and `--paper`/
+  `--paper-major` (squared exercise-book paper, the site's background graphic), all in `global.css`.
+  New raised surfaces use these instead of a single flat shadow.
 - Template sections with nothing true to show were adapted, not faked. Stats show real counts from
   the products. Partner logos became the "school or academy?" product chooser. The newsletter became
   the demo band. Testimonials render only when `site.json` has real ones.

@@ -18,13 +18,13 @@ const angle = (i) => {
   return i < side ? -deg : deg;
 };
 ---
-<section class="hero">
+<section class="hero" data-parallax>
   <div class="wrap text">
     <h1><span class="line small">{small}</span> <span class="line big">{big}</span></h1>
     {lead && <p>{lead}</p>}
   </div>
 
-  <div class="stage" data-parallax>
+  <div class="stage">
     <ul class="tiles" aria-hidden="true">
       {tiles.map((name, i) => (
         <li style={`--a: ${angle(i)}deg; --i: ${i}; --depth: ${i % 2 ? 1 : 0.55}`}>
@@ -32,7 +32,7 @@ const angle = (i) => {
         </li>
       ))}
     </ul>
-    <Device class="phone" label={screenLabel}><slot><Screen kind={screen} /></slot></Device>
+    <div class="lift"><Device class="phone" label={screenLabel}><slot><Screen kind={screen} /></slot></Device></div>
     <div class="rings" aria-hidden="true"></div>
   </div>
 
@@ -48,18 +48,27 @@ const angle = (i) => {
     isolation: isolate;
   }
 
-  /* Dot texture behind the headline, as in the template. */
-  .hero::before {
+  /* Squared exercise-book paper behind the headline (the template's dot texture, made the
+     school's own). Two sheets, fine and coarse, slide at different rates with the pointer,
+     so the page reads as layers, not a flat print. */
+  .hero::before,
+  .hero::after {
     content: "";
     position: absolute;
-    inset-block-start: 90px;
-    inset-inline: 0;
-    margin-inline: auto;
-    inline-size: min(520px, 80vw);
-    block-size: 320px;
-    background: radial-gradient(#d3d6e0 1.2px, transparent 1.4px) 0 0 / 18px 18px;
-    mask-image: radial-gradient(closest-side, #000, transparent);
+    inset-block-start: 40px;
+    left: 50%;
+    inline-size: min(1100px, 100vw);
+    block-size: 640px;
+    background: var(--paper);
+    mask-image: radial-gradient(closest-side, #000 30%, transparent);
+    translate: calc(-50% + var(--px, 0) * -6px) calc(var(--py, 0) * -4px);
+    transition: translate 0.8s ease-out;
     z-index: -1;
+  }
+
+  .hero::after {
+    background: var(--paper-major);
+    translate: calc(-50% + var(--px, 0) * -18px) calc(var(--py, 0) * -12px);
   }
 
   h1 {
@@ -99,25 +108,85 @@ const angle = (i) => {
   .phone {
     --device-w: clamp(220px, 24vw, 280px);
     --base: 1.7s; /* the roll call starts once the phone has risen */
-    position: relative;
-    z-index: 1;
-    translate: calc(var(--px, 0) * -6px) calc(var(--py, 0) * -4px);
-    transition: translate 0.6s ease-out;
   }
 
+  /* The phone turns in 3D toward the pointer; a glare slides across its glass as it does.
+     .lift carries the pose so the phone's own rise animation stays independent. */
+  .lift {
+    position: relative;
+    z-index: 1;
+    transform: perspective(1100px) translate(calc(var(--px, 0) * -6px), calc(var(--py, 0) * -4px))
+      rotateY(calc(var(--px, 0) * 9deg)) rotateX(calc(var(--py, 0) * -5deg));
+    transition: transform 0.7s ease-out;
+  }
+
+  /* Light the screen throws onto the paper behind it. */
+  .lift::before {
+    content: "";
+    position: absolute;
+    inset: 4% -45% 20%;
+    background: radial-gradient(closest-side, rgba(20, 105, 235, 0.2), transparent);
+    z-index: -1;
+  }
+
+  .lift::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 44px;
+    /* A vertical streak in an image 3× the phone's width: position 0% puts it past the right
+       edge, 80% just past the left. It rests there and comes onto the glass as the pointer
+       moves left. */
+    background: linear-gradient(90deg, transparent 43%, rgba(255, 255, 255, 0.32) 48%, transparent 53%) 0 0 / 300% 100%;
+    background-position-x: calc(80% + var(--px, 0) * 20%);
+    pointer-events: none;
+    transition: background-position 0.7s ease-out;
+    animation: hero-glare 1.3s cubic-bezier(0.4, 0, 0.2, 1) 1.6s backwards;
+  }
+
+  @keyframes hero-glare {
+    from {
+      background-position-x: 0%;
+    }
+
+    to {
+      background-position-x: 80%;
+    }
+  }
+
+  /* Rings as a lit stepped dome: deeper greens, light from above, a bright rim on each step,
+     and a glow the dome casts up onto the grey. */
   .rings {
     position: absolute;
     inset-block-end: 0;
     inline-size: var(--ring-w);
     aspect-ratio: 2 / 1;
     border-radius: 100vw 100vw 0 0;
-    background: radial-gradient(
-      circle farthest-side at 50% 100%,
-      #0fa478 0 55%,
-      #12bb89 55% 70%,
-      #13cf97 70% 85%,
-      #2ae8b0 85% 100%
-    );
+    background:
+      radial-gradient(
+        circle farthest-side at 50% 100%,
+        transparent 54.6%,
+        rgba(255, 255, 255, 0.45) 55%,
+        transparent 55.5%,
+        transparent 69.6%,
+        rgba(255, 255, 255, 0.4) 70%,
+        transparent 70.5%,
+        transparent 84.6%,
+        rgba(255, 255, 255, 0.4) 85%,
+        transparent 85.5%,
+        transparent 99.2%,
+        rgba(255, 255, 255, 0.7) 99.7%
+      ),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.16), transparent 22%, rgba(4, 48, 36, 0.3) 45%),
+      var(--grain),
+      radial-gradient(
+        circle farthest-side at 50% 100%,
+        #077a59 0 55%,
+        #0b956d 55% 70%,
+        #0fb281 70% 85%,
+        #16cd96 85% 100%
+      );
+    box-shadow: 0 -12px 90px -36px rgba(20, 226, 164, 0.45);
     left: 50%;
     translate: -50% 55%;
     transform-origin: 50% 100%;
@@ -145,16 +214,34 @@ const angle = (i) => {
     transition: translate 0.5s ease-out;
   }
 
+  /* Glass tiles with depth of field: near ones (even) sit in front of the dome, crisp;
+     far ones sit behind the phone and dome, smaller and slightly out of focus. */
+  .tiles li:nth-child(odd) {
+    z-index: 1;
+  }
+
+  .tiles li:nth-child(even) {
+    z-index: 3;
+  }
+
   .tile {
     display: grid;
     place-items: center;
     block-size: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.9);
     border-radius: 20px;
-    background: var(--white);
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.72));
+    backdrop-filter: blur(10px) saturate(1.4);
     color: var(--blue);
-    box-shadow: var(--shadow);
+    box-shadow: var(--rim), inset 0 -2px 0 rgba(7, 65, 154, 0.05), var(--shadow);
     animation: hero-float 5.5s ease-in-out infinite alternate;
     animation-delay: calc(var(--i) * -0.9s);
+  }
+
+  .tiles li:nth-child(odd) .tile {
+    scale: 0.8;
+    opacity: 0.88;
+    filter: blur(0.7px);
   }
 
   .tiles li:nth-child(even) .tile {

@@ -16,10 +16,20 @@ const { label, class: className, ...rest } = Astro.props;
     aspect-ratio: 9 / 18.5;
     padding: 10px;
     border-radius: 44px;
-    background: var(--white);
+    /* Bezel lit from above: bright top edge, a shade darker toward the bottom, then a tight
+       contact shadow under a long soft one. */
+    background: linear-gradient(170deg, var(--white) 40%, #e9edf5);
     box-shadow:
-      0 30px 60px rgba(7, 65, 154, 0.22),
-      inset 0 0 0 1px var(--line);
+      inset 0 0 0 1px var(--line),
+      inset 0 2px 0 var(--white),
+      0 2px 4px rgba(20, 18, 43, 0.06),
+      0 24px 48px -12px rgba(7, 65, 154, 0.22),
+      0 64px 100px -32px rgba(7, 65, 154, 0.28);
+  }
+
+  /* Inner edge of the glass, so the screen sits in the frame instead of on it. */
+  .screen {
+    box-shadow: inset 0 0 0 1px rgba(35, 32, 63, 0.06);
   }
 
   .screen {
