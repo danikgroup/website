@@ -21,6 +21,12 @@ is darker than the template's.
   `--rim` (top-edge highlight), `--grain` (film grain layered over colour bands) and `--paper`/
   `--paper-major` (squared exercise-book paper, the site's background graphic), all in `global.css`.
   New raised surfaces use these instead of a single flat shadow.
+- Performance rules learned the hard way: no `backdrop-filter` (twenty of them cost over a second of
+  main thread on a throttled phone; fake frosting with a near-opaque gradient), and `.section`,
+  `.trust`, `.chooser` carry `content-visibility: auto`, so nothing inside them may stick out of the
+  box (it would be clipped; the demo band is exempt for its phone). Grey sections use `.grey-band`,
+  which also darkens `--muted` to stay above 4.5:1. Pages without an `image` share
+  `src/assets/og-default.jpg` (logo on grey, rendered once with sharp; re-render if the logo changes).
 - Template sections with nothing true to show were adapted, not faked. Stats show real counts from
   the products. Partner logos became the "school or academy?" product chooser. The newsletter became
   the demo band. Testimonials render only when `site.json` has real ones.

@@ -3,6 +3,7 @@
 :root {
   --navy: #23203f;
   --muted: #716f87;
+  --muted-on-grey: #68667e; /* the template's muted is 4.3:1 on --grey; this is 4.9:1 */
   --blue: #1469eb;
   --blue-2: #4d8af0;
   --green: #14e2a4;
@@ -111,6 +112,23 @@ svg {
 
 .section {
   padding-block: var(--section);
+}
+
+/* Off-screen sections skip layout and paint until they near the viewport: the long product and
+   home pages spent half a second laying out text nobody could see yet on a mid-range phone.
+   Not for anything whose content sticks out of its box (the demo band's phone), which it would clip. */
+.section,
+.trust,
+.chooser {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+/* A grey section: its muted text darkens to stay above 4.5:1 contrast. */
+.grey-band {
+  --muted: var(--muted-on-grey);
+  background: var(--grey);
+  color: var(--muted);
 }
 
 /* Centred heading + one paragraph, the template's section opener. */

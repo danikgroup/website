@@ -42,7 +42,12 @@ Format (based on Keep a Changelog: https://keepachangelog.com/en/1.1.0/):
 - Add a depth field to the hero: floating glass icons and two school chips (grade «۲۰», «حاضر») around the headline, focused on the phone. Items further from it are smaller, fainter, more blurred and float slower; two lens-blurred ones sit in front; pointer parallax pivots on the phone. Phones keep only the faint far layer.
 - Pitch the products on every page: the home page gains a «دفتر، اکسل و گروه پیام‌رسان؛ یا یک پنل؟» before/after table, a panel-per-role section, a «اطلاعات بچه‌ها پیش خودتان می‌ماند» data-safety band and a general FAQ (FAQPage JSON-LD); product pages gain before/after rows, an hour-by-hour «یک روز با …» timeline, the data-safety band, a «مناسب شماست اگر…» list with the other product, and longer FAQs; contact explains the three steps after a call and what to prepare; blog, posts and 404 end with product cards and the demo band.
 - Add `pains`, `day` and `fit` product fields (schema and CMS) for the product page's sales sections.
+- Give every page a 1200×630 share card (`src/assets/og-default.jpg`, the logo on the brand grey, when a page has no image of its own) with `og:image:width/height` and a large Twitter card; add the product screenshot to each product's `SoftwareApplication` and the address to `Organization`.
 
 ### Fixed
 - Fix the home page laying out wider than phone screens while product phones waited to swing in.
 - Fix the products megamenu closing while the cursor moved from «محصولات» to the panel: the hover area now spans the header bar and closing waits briefly (hover intent).
+- Fix the home page's title, which was only the brand name; it now leads with «نرم‌افزار مدیریت مدرسه و آموزشگاه».
+- Fix muted text on grey sections (hero and page leads, before/after tables) falling to 4.3:1 contrast; a `.grey-band` class and `--muted-on-grey` keep it at 4.9:1.
+- Fix the product pages' slow first load on phones (Lighthouse performance 60–70): drop `backdrop-filter` from the hero tiles and product cards, and let off-screen sections skip layout with `content-visibility: auto`.
+- Fix the 404 page's too-short meta description.

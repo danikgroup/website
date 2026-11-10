@@ -1,6 +1,6 @@
 ---
 import { render } from "astro:content";
-import { Image } from "astro:assets";
+import { Image, getImage } from "astro:assets";
 import Base from "../../layouts/Base.astro";
 import Hero from "../../components/Hero.astro";
 import Features from "../../components/Features.astro";
@@ -23,6 +23,7 @@ export async function getStaticPaths() {
 const { product } = Astro.props;
 const { data } = product;
 const { Content } = await render(product);
+const shot = data.screenshot && (await getImage({ src: data.screenshot, width: 660, format: "jpg" }));
 
 
 const jsonLd = [
@@ -38,6 +39,7 @@ const jsonLd = [
     inLanguage: "fa",
     url: new URL(Astro.url.pathname, Astro.site).href,
     featureList: data.features.map((f) => f.title),
+    ...(shot && { screenshot: new URL(shot.src, Astro.site).href }),
     publisher: { "@type": "Organization", name: site.name },
   },
   breadcrumbs(Astro.site, [[site.name, "/"], [data.name, `/products/${product.id}/`]]),
@@ -67,7 +69,7 @@ const jsonLd = [
   </section>
 
   {data.pains.length > 0 && (
-    <section class="section pains" aria-labelledby="pains">
+    <section class="section grey-band" aria-labelledby="pains">
       <div class="wrap">
         <div class="intro">
           <h2 id="pains">کارهایی که {data.name} از دوشتان برمی‌دارد</h2>
@@ -143,10 +145,6 @@ const jsonLd = [
     margin-block-start: 64px;
     border-radius: 28px;
     box-shadow: var(--shadow);
-  }
-
-  .pains {
-    background: var(--grey);
   }
 
   .day {

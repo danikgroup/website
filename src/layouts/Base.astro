@@ -5,6 +5,9 @@ import "../styles/global.css";
 import { getImage } from "astro:assets";
 import Header from "../components/Header.astro";
 import logo from "../assets/logo.png";
+// The logo centred on --grey at 1200×630, rendered once from logo.png with sharp (Astro won't
+// enlarge the 500px logo to share-card size). Re-render it if the logo changes.
+import ogDefault from "../assets/og-default.jpg";
 import site from "../data/site.json";
 import { href, products as getProducts } from "../utils.js";
 
@@ -20,10 +23,10 @@ const tabIcon = await getImage({ src: logo, width: 64, height: 64, format: "png"
 const touchIcon = await getImage({ src: logo, width: 180, height: 180, format: "png", background: "#ffffff" });
 const logoImage = await getImage({ src: logo, width: 500, height: 500, format: "png" });
 
-// A page's own image makes a large share card; otherwise the logo makes a small one.
-const ogImage = image && (await getImage({ src: image, width: 1200, height: 630, fit: "cover", format: "jpg" }));
-const ogImageUrl = ogImage ? absolute(ogImage) : absolute(logoImage);
-const ogImageAlt = ogImage ? imageAlt : `نشان ${site.name}`;
+// Every page shares a 1200×630 card: the page's own image, else the logo card.
+const ogImage = await getImage({ src: image ?? ogDefault, width: 1200, height: 630, fit: "cover", format: "jpg" });
+const ogImageUrl = absolute(ogImage);
+const ogImageAlt = image ? imageAlt : `نشان ${site.name}`;
 const year = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date());
 
 const organization = {
@@ -35,6 +38,7 @@ const organization = {
   logo: absolute(logoImage),
   ...(site.email && { email: site.email }),
   ...(site.phone && { telephone: site.phone }),
+  ...(site.address && { address: { "@type": "PostalAddress", streetAddress: site.address, addressCountry: "IR" } }),
   ...(site.social.length && { sameAs: site.social.map((s) => s.url) }),
 };
 ---
@@ -60,8 +64,10 @@ const organization = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={ogImageAlt} />
-    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <script type="application/ld+json" set:html={JSON.stringify([organization, ...jsonLd])} />
     <!-- Before first paint: animation start states apply only when the motion script will run. -->
