@@ -51,3 +51,6 @@ Format (based on Keep a Changelog: https://keepachangelog.com/en/1.1.0/):
 - Fix muted text on grey sections (hero and page leads, before/after tables) falling to 4.3:1 contrast; a `.grey-band` class and `--muted-on-grey` keep it at 4.9:1.
 - Fix the product pages' slow first load on phones (Lighthouse performance 60–70): drop `backdrop-filter` from the hero tiles and product cards, and let off-screen sections skip layout with `content-visibility: auto`.
 - Fix the 404 page's too-short meta description.
+
+### Changed
+- Replace @astrojs/sitemap with a build-time /sitemap.xml generated from the pages and the products/posts collections, with lastmod on posts; robots.txt and the head link point to it.

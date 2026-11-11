@@ -66,7 +66,7 @@ is darker than the template's.
   (remote `git@github.com:danikgroup/website.git`). Repo Settings, then Pages, then Source must be
   "GitHub Actions". The custom domain is set in the Pages settings, not in a `CNAME` file.
   `actions/configure-pages` reports the live URL, and the build gets it as `SITE_URL`/`BASE_PATH`.
-- No new dependency for something Astro or the platform already does (sitemap = `@astrojs/sitemap`,
+- No new dependency for something Astro or the platform already does (sitemap = `src/pages/sitemap.xml.js`,
   RSS = `@astrojs/rss`, images = `astro:assets`, font = `@fontsource-variable/vazirmatn`,
   icons = `@lucide/astro`, rendered to inline SVG at build time).
 
@@ -147,7 +147,7 @@ One shared layout/head component owns these, so pages only pass data:
 - Unique `<title>` and meta description, a canonical URL, and Open Graph + Twitter card tags with a 1200×630 image.
 - JSON-LD: `Organization` site-wide, `SoftwareApplication` on each product page, `BlogPosting` on posts,
   `BreadcrumbList` on nested pages, `FAQPage` where a page has an FAQ.
-- `sitemap-index.xml` (`@astrojs/sitemap`), `robots.txt` that points to it, and an RSS feed for posts.
+- `sitemap.xml` (`src/pages/sitemap.xml.js`: every non-`[param]` page plus products and posts, posts with `lastmod`), `robots.txt` that points to it, and an RSS feed for posts.
 - Semantic HTML with one `<h1>`. Every image gets meaningful Persian `alt`, explicit dimensions, and
   goes through `astro:assets` (AVIF/WebP, lazy except the LCP image).
 - Clean slugs: Latin/transliterated, stable, never changed after publish.
